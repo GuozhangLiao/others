@@ -1,0 +1,5 @@
+{
+    "fileheader.tpl": "# @Author: {author}  # @Repository: https://github.com/vod-ka   # @Date: {createTime}  # @Last Modified by:   {lastModifiedBy}  # @Last Modified time: {updateTime}  ",
+    "fileheader.Author": "Aliao",
+    "fileheader.LastModifiedBy": "Aliao"
+}
