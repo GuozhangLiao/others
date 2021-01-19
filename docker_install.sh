@@ -27,7 +27,8 @@ DockerInstall(){
     #安装docker引擎
     yum -y install docker-ce docker-ce-cli containerd.io
     #设置开机自启和运行docker
-    
+    systemctl enable docker
+    systemctl start docker    
 }
 
 
