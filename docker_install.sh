@@ -10,7 +10,7 @@ SCRIPT="docker_install.sh"
 
 #检验内核版本
 CheckVersion(){
-    if [ $A -ge 3.10 ]
+    if [ $A -gt 3.00 ]
     then
         DockerInstall
     else
