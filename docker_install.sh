@@ -59,7 +59,6 @@ REMOVEDocker(){
     find / -name $SCRIPT -exec rm -f {} \;
 }
 
-
 #脚本菜单
 STARTMenu(){
     clear
@@ -87,7 +86,7 @@ STARTMenu(){
     echo "--------------------------"
     echo "0，exit"
     echo "--------------------------"
-    read -p "输入数字执行" MUN
+    read -p "输入数字执行: " MUN
     case "$MUN" in
         1)
         CheckVersion
