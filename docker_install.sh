@@ -5,12 +5,12 @@
 # @Last Modified by:   Aliao  
 # @Last Modified time: 2021-01-18 23:30:08
 
-A=$(uname -r | cut -d "." -f1-2)
+A=$(uname -r | cut -d "." -f1)
 SCRIPT="docker_install.sh"
 
 #检验内核版本
 CheckVersion(){
-    if [ $A -gt 3.00 ]
+    if [ $A -gt 3 ]
     then
         DockerInstall
     else
@@ -95,22 +95,18 @@ STARTMenu(){
         ;;
         2)
         STARTDocker
-        clear
         STARTMenu
         ;;
         3)
         STOPDocker
-        clear
         STARTMenu
         ;;
         4)
         RELOADDocker
-        clear
         STARTMenu
         ;;
         5)
         TESTDocker
-        clear
         STARTMenu
         ;;
         6)
