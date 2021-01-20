@@ -10,7 +10,7 @@ SCRIPT="docker_install.sh"
 
 #检验内核版本
 CheckVersion(){
-    if [ $A -gt 3 ]
+    if [ $A -ge 3 ]
     then
         DockerInstall
     else
@@ -21,15 +21,20 @@ CheckVersion(){
 #安装docker
 DockerInstall(){
     #卸载旧版本
-    yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate  docker-engine
+    yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate  docker-engine > /dev/null
     #设置仓库
     yum install -y yum-utils
     yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
     #安装docker引擎
     yum -y install docker-ce docker-ce-cli containerd.io
     #设置开机自启和运行docker
-    systemctl enable docker
-    systemctl start docker    
+    systemctl enable docker > /dev/null
+    systemctl start docker
+    echo "docker 安装成功"
+    echo "....."
+    echo ".........."
+    echo "..............."
+    echo "....................."
 }
 
 #启动docker
@@ -50,11 +55,15 @@ RELOADDocker(){
 #测试doucker
 TESTDocker(){
     docker run hello-world
+    echo
+    echo
+    echo
 }
 
 #卸载docker
 REMOVEDocker(){
-    yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate  docker-engine
+    yum remove -y docker-ce-cli.x86_64 docker-ce.x86_64 docker-ce-rootless-extras.x86_64
+    find / -name docker -exec rm -rf {} \;
     echo "----------------------------------卸载docker完成"
     find / -name $SCRIPT -exec rm -f {} \;
 }
