@@ -78,9 +78,9 @@ STARTMenu(){
     echo "#                  @Repository: https://github.com/vod-ka               #"
     echo "#                                                                       #"
     echo "========================================================================="
-    echo "                          "
-    echo "                          "
-    echo "                          "
+    echo 
+    echo 
+    echo 
     echo "1，安装docker"
     echo "--------------------------"
     echo "2，启动docker"
