@@ -300,3 +300,64 @@ echo $a
 ![alt 属性文本](图片网址)
 
 ![alt 属性文本](图片地址 "可选标题")
+
+**实例：**
+
+![HazelMoore 图片](https://github.com/GuozhangLiao/guozhangliao.github.io/raw/master/docs/119805224_245184746870599_3083082065952715794_n.jpg)
+
+![HazelMoore 图片](https://github.com/GuozhangLiao/guozhangliao.github.io/raw/master/docs/120900822_2061217864177792_8681669273875617376_n.jpg)
+
+***
+
+**也可以像网址那样对图片网址使用变量:**
+
+这个图片链接用 3 作为网址变量 [HazelMoore][3]
+然后在文档的结尾为变量赋值
+
+[3]: https://github.com/GuozhangLiao/guozhangliao.github.io/raw/master/docs/109758355_161886312110184_6417260832615727042_n.jpg
+
+***
+
+**Markdown 还没有办法指定图片的高度与宽度，如果你需要的话，你可以使用普通的 <img> 标签**
+
+**实例：**
+
+<img src="https://github.com/GuozhangLiao/guozhangliao.github.io/raw/master/docs/119805224_245184746870599_3083082065952715794_n.jpg" width="50%">
+
+***
+***
+***
+
+## 八、Markdown 表格篇
+
+**Markdown 制作表格使用 | 来分隔不同的单元格，使用 - 来分隔表头和其他行。**
+
+**语法格式如下：**
+
+| 表头 | 表头 |
+| ---- | ---- |
+| 单元格 | 单元格 |
+| 单元格 | 单元格 |
+
+***
+
+### 对齐方式
+
+**我们可以设置表格的对齐方式：**
+
+* -: 设置内容和标题栏居右对齐
+* :- 设置内容和标题栏居左对齐
+* :-: 设置内容和标题栏居中对齐
+
+**实例：**
+
+| 左对齐 | 右对齐  | 居中对齐 |
+| :----- | -----: | :-----: |
+| 单元格 | 单元格 | 单元格 |
+| 单元格 | 单元格 | 单元格 |
+
+***
+***
+***
+
+### 九、Markdown 的高级技巧
