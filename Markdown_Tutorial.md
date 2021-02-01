@@ -1,6 +1,6 @@
 # Markdown 教程
 
-**这是一个 Markdown 语法教程！**
+**这是一个 Markdown 基础语法教程！**
 
 ***
 
@@ -232,11 +232,11 @@ www.youtube.com
 
 **实例：**
 
-        #!/bin/bash
-        for IP in {170..255}
-        do
-            ping -c 1  $1.$IP | grep "64 bytes" | tr -d ":" | cut -d " " -f 4 
-        done
+    #!/bin/bash
+    for IP in {170..255}
+    do
+        ping -c 1  $1.$IP | grep "64 bytes" | tr -d ":" | cut -d " " -f 4 
+    done
 
 ***
 
@@ -249,5 +249,54 @@ www.youtube.com
 a=10
 echo $a
 ```
+
+***
+***
 ***
 
+## 六、Mrakdown 链接篇
+
+**链接的使用方法：**
+
+[链接名称](链接地址)
+
+**或者**
+
+<链接地址>
+
+**实例：**
+
+这是一个链接 [Pronhub](https://www.pronhub.com)
+
+***
+
+**直接使用链接地址：**
+
+<https://www.google.com>
+
+***
+
+### 高级链接
+
+**可以通过变量来设置一个链接，变量赋值在文档末尾进行：**
+
+**实例：**
+
+这个链接用 2 作为网址变量 [Google][2]
+这个链接用 github 作为网址变量 [Github][github]
+然后在文档的结尾为变量赋值（网址）
+
+[2]: https://google.com/
+[github]: https://github.com/
+
+***
+***
+***
+
+## 七、Markdown 图片篇
+
+**Markdown 图片语法格式：**
+
+![alt 属性文本](图片网址)
+
+![alt 属性文本](图片地址 "可选标题")
