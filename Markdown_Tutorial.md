@@ -90,7 +90,7 @@ www.youtube.com
 
 ### 4,下划线
 
-**下划线可以通过 HTML 的 <u>标签</u> 来实现。**
+**下划线可以通过 HTML 的 \<u> 标签来实现。**
 
 **实例：**
 
@@ -318,11 +318,13 @@ echo $a
 
 ***
 
-**Markdown 还没有办法指定图片的高度与宽度，如果你需要的话，你可以使用普通的 <img> 标签**
+**Markdown 还没有办法指定图片的高度与宽度，如果你需要的话，你可以使用普通的 \<img> 标签**
 
 **实例：**
 
 <img src="https://github.com/GuozhangLiao/guozhangliao.github.io/raw/master/docs/119805224_245184746870599_3083082065952715794_n.jpg" width="50%">
+
+<img src="https://github.com/GuozhangLiao/guozhangliao.github.io/raw/master/docs/109758355_161886312110184_6417260832615727042_n.jpg" alt="HazelMoore" align=center width="960" height="480">
 
 ***
 ***
@@ -360,4 +362,14 @@ echo $a
 ***
 ***
 
-### 九、Markdown 的高级技巧
+## 九、Markdown 的高级技巧
+
+### 支持的 HTML 元素
+
+**不再 Mrakedown 涵盖范围之内的标签，都可以直接在文档里面用 HTML 编写。**
+
+**目前支持的 HTML 元素有：\<kbd> \<b> \<i> \<em> \<sup> \<sub> \<br>等。**
+
+**实例：**
+
+使用 <kbd>Ctl</kbd>+<kbd>Alt</kbd>+<kbd>Del</kbd> 重启计算机

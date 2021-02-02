@@ -1,0 +1,12 @@
+{
+    "default": true,
+    "MD033": {
+      "allowed_elements": [ "kbd", "b", "i", "em", "u", "img" ]
+    },
+    "MD013": {
+      "strict": false,
+      "code_blocks": false,
+      "tables": false,
+      "headings": false
+    }
+}
