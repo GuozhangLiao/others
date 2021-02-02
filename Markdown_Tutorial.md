@@ -1,6 +1,6 @@
 # Markdown 教程
 
-**这是一个 Markdown 基础语法教程！**
+**这是一篇用 Markdown 编写的 Markdown 基础语法教程！**
 
 ***
 
@@ -244,7 +244,7 @@ www.youtube.com
 
 **实例：**
 
-```
+```bash
 #!/bin/bash
 a=10
 echo $a
@@ -373,3 +373,96 @@ echo $a
 **实例：**
 
 使用 <kbd>Ctl</kbd>+<kbd>Alt</kbd>+<kbd>Del</kbd> 重启计算机
+
+***
+
+### 转义
+
+**Markdown 使用了很多特殊符号来表示特定的意义，如果需要显示特定的符号则需要使用转义字符，Markdown 使用 \ 反斜杠转义特殊字符：**
+
+**实例:**
+
+**转义前的效果**
+
+\*\*转义后的效果\*\*
+
+***
+
+**Markdown 支持以下这些符号前面加上反斜杠来帮助插入普通的符号：**
+
+* \\ 反斜杠
+* \` 反引号
+* \* 星号
+* \_ 下划线
+* \{} 花括号
+* \[] 方括号
+* \() 小括号
+* \# 井号
+* \+ 加号
+* \- 减号
+* \. 英文句号
+* \! 感叹号
+
+***
+
+### 公式
+
+**当你需要在编辑器中插入数学公式时，可以使用两个美元符 \$$ 包裹 TeX 或 LaTeX 格式的数学公式来实现。需要加载 Mathjax 对数学公式进行渲染。**
+
+**实例：**
+
+$$\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.$$
+
+$$
+f(n)
+\begin{cases}
+\cfrac n2, &if\ n\ is\ even\\
+3n + 1, &if\  n\ is\ odd
+\end{cases}
+$$
+
+***Markdown 公式应用参考[教程](https://www.jianshu.com/p/25f0139637b7)***
+
+***
+***
+
+### 流程图
+
+#### 1、横向流程图源码格式
+
+```mermaid
+graph LR
+A[方形] -->B(圆角)
+    B --> C{条件a}
+    C -->|a=1| D[结果1]
+    C -->|a=2| E[结果2]
+    F[横向流程图]
+```
+***
+
+#### 2、竖向流程图源码格式
+
+```mermaid
+graph TD
+A[方形] --> B(圆角)
+    B --> C{条件a}
+    C --> |a=1| D[结果1]
+    C --> |a=2| E[结果2]
+    F[竖向流程图]
+```
+
+***
+
+#### 3、标准流程图源码格式
+
+```flow
+st=>start: 开始框
+op=>operation: 处理框
+cond=>condition: 判断框(是或否?)
+sub1=>subroutine: 子流程
+io=>inputoutput: 输入输出框
+e=>end: 结束框
+st->op->cond
+cond(yes)->io->e
+cond(no)->sub1(right)->op
+```
