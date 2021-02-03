@@ -322,9 +322,9 @@ echo $a
 
 **实例：**
 
-<img src="https://github.com/GuozhangLiao/guozhangliao.github.io/raw/master/docs/119805224_245184746870599_3083082065952715794_n.jpg" width="50%">
+<img src="https://github.com/GuozhangLiao/guozhangliao.github.io/raw/master/docs/119805224_245184746870599_3083082065952715794_n.jpg" width="50%" />
 
-<img src="https://github.com/GuozhangLiao/guozhangliao.github.io/raw/master/docs/109758355_161886312110184_6417260832615727042_n.jpg" alt="HazelMoore" align=center width="960" height="480">
+<img src="https://github.com/GuozhangLiao/guozhangliao.github.io/raw/master/docs/109758355_161886312110184_6417260832615727042_n.jpg" alt="HazelMoore" align=center width="960" height="480" />
 
 ***
 ***
