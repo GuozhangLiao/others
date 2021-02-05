@@ -33,7 +33,7 @@ git_install(){
 #安装 gcc-7.3
 gcc_install(){
     yum install -y centos-release-scl > /dev/null 2>&1
-    yum install devtoolset-7-gcc* > /dev/null 2>&1
+    yum install -y devtoolset-7-gcc* > /dev/null 2>&1
     scl enable devtoolset-7 bash
     gcc -v
     Green "安装 gcc-7.3 完成"
