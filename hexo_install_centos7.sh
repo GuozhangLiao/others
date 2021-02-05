@@ -35,7 +35,12 @@ gcc_install(){
     yum install -y centos-release-scl > /dev/null 2>&1
     yum install -y devtoolset-7-gcc* > /dev/null 2>&1
     scl enable devtoolset-7 bash
-    gcc -v
+    source /opt/rh/devtoolset-7/enable
+    mv /usr/bin/gcc /usr/bin/gcc-4.8.5
+    ln -s /opt/rh/devtoolset-7/root/bin/gcc /usr/bin/gcc
+    mv /usr/bin/g++ /usr/bin/g++-4.8.5
+    ln -s /opt/rh/devtoolset-7/root/bin/g++ /usr/bin/g++
+    gcc -v || exit 0
     Green "安装 gcc-7.3 完成"
 }
 
