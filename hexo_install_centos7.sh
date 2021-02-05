@@ -79,21 +79,21 @@ inithexo() {
 menu(){
     clear
     set -e
-    echo "========================================================================="
-    echo "#                                                                       #"
-    echo "#                  @Name: hexo_centos7_install_script                   #"
-    echo "#                  @Author: Aliao                                       #"
-    echo "#                  @Repository: https://github.com/vod-ka               #"
-    echo "#                                                                       #"
-    echo "========================================================================="
-    echo
-    echo
-    echo "1，安装Hexo"
-    echo "--------------------------"
-    echo "2，初始化Hexo"
-    echo "--------------------------"
-    echo "0，exit"
-    echo "--------------------------"
+    Red "========================================================================="
+    Red "#                                                                       #"
+    Red "#                  @Name: hexo_centos7_install_script                   #"
+    Red "#                  @Author: Aliao                                       #"
+    Red "#                  @Repository: https://github.com/vod-ka               #"
+    Red "#                                                                       #"
+    Red "========================================================================="
+    Red
+    Red
+    Red "1，安装Hexo"
+    Red "--------------------------"
+    Red "2，初始化Hexo"
+    Red "--------------------------"
+    Red "0，exit"
+    Red "--------------------------"
     read -p "请输入数字，回车键继续： " number
     case "$number" in
         1)
