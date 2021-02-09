@@ -40,16 +40,16 @@ gcc_install(){
     ln -s /opt/rh/devtoolset-7/root/bin/gcc /usr/bin/gcc
     mv /usr/bin/g++ /usr/bin/g++-4.8.5
     ln -s /opt/rh/devtoolset-7/root/bin/g++ /usr/bin/g++
-    gcc -v || exit 0
+    gcc -v 
     Green "安装 gcc-7.3 完成"
 }
 
 #编译安装最新 LTS的 Node.js
 compile_nodejs(){
-    cd $HOME || exit 0
+    cd $HOME 
     curl -sOL https://nodejs.org/dist/v14.15.4/node-v14.15.4.tar.gz
     tar -zxf node-v14.15.4.tar.gz
-    cd node-v14.15.4 || exit 0
+    cd node-v14.15.4 
     ./configure && make && make install
     clear
     node -v
@@ -73,7 +73,7 @@ hexoinstall() {
 inithexo() {
     read -p '请输入需要初始化的项目路径: ' lj
     hexo init $lj
-    cd $lj || exit 0
+    cd $lj 
     npm install
     hexo g
     hexo s
