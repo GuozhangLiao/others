@@ -5,6 +5,9 @@
 # @Last Modified by:   Aliao  
 # @Last Modified time: 2021-02-05 16:43:30
 
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:~/bin
+export PATH
+
 nodedst=$(/usr/bin/which node)
 
 #颜色

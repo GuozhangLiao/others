@@ -5,7 +5,8 @@
 # @Last Modified by:   Aliao  
 # @Last Modified time: 2021-02-08 19:31:05
 
-
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:~/bin
+export PATH
 
 #颜色
 Green(){
