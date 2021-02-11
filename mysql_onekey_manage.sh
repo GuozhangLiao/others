@@ -62,21 +62,30 @@ remove_mdb() {
 compile_mysql() {
     groupadd mysql
     useradd mysql -g mysql -s /sbin/nologin
+    mkdir $HOME/my_boost
     cd $HOME
     wget http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.30.tar.gz
     tar -zxvf $HOME/mysql-5.7.30.tar.gz
-    cd $HOME/mysql-5.7.30
-    cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql/ \
+    mkdir $HOME/mysql-5.7.30/bld
+    cd $HOME/mysql-5.7.30/bld
+    cmake .. -DBUILD_CONFIG=mysql_release \
+    -DCPACK_MONOLITHIC_INSTALL=0 \
+    -DDOWNLOAD_BOOST=1 \
+    -DDOWNLOAD_BOOST_TIMEOUT=1200 \
+    -DFORCE_UNSUPPORTED_COMPILER=1 \
+    -DIGNORE_AIO_CHECK=1 \
+    -DMYSQL_MAINTAINER_MODE=0 \
+    -DWITH_BOOST=/root/my_boost \
+    -DWITH_CURL=system \
+    -DWITH_SSL=system \
+    -DCMAKE_INSTALL_PREFIX=/usr/local/mysql/ \
     -DCMAKE_USER=mysql \
-    -DMYSQL_TCP_PORT=3306 \
     -DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock \
     -DSYSCONFDIR=/etc \
     -DSYSTEMD_PID_DIR=/usr/local/mysql/ \
     -DDEFAULT_CHARSET=utf8  \
     -DDEFAULT_COLLATION=utf8_general_ci \
     -DWITH_EXTRA_CHARSETS=all \
-    -DWITH_INNOBASE_STORAGE_ENGINE=1 \
-    -DWITH_MEMORY_STORAGE_ENGINE=1 \
     -DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
     -DWITH_PERFSCHEMA_STORAGE_ENGINE=1 \
     -DWITH_READLINE=1 \
