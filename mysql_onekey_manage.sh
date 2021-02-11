@@ -38,7 +38,7 @@ compile_cmake() {
     cd $HOME || exit
     wget https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4.tar.gz
     tar -zxvf $HOME/cmake-3.19.4.tar.gz
-    cd $HOME/cmake-3.19.4-Linux-x86_64 || exit
+    cd $HOME/cmake-3.19.4 || exit
     ./bootstrap
     make && make install
     cmake -version
