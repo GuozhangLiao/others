@@ -58,7 +58,7 @@ compile_mysql() {
     groupadd mysql
     useradd mysql -g mysql -s /sbin/nologin
     cd $HOME
-    wget https://downloads.mysql.com/archives/get/p/23/file/mysql-5.7.30.tar.gz
+    wget http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.30.tar.gz
     tar -zxvf $HOME/mysql-5.7.30.tar.gz
     cd $HOME/mysql-5.7.30
     cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql/ \
