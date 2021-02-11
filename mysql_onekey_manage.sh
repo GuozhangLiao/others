@@ -104,7 +104,7 @@ compile_mysql() {
 #main
 system_update
 tools_install
-higher_speed
+#higher_speed
 compile_cmake
 remove_mdb
 compile_mysql
