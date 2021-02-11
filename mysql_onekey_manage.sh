@@ -64,7 +64,7 @@ compile_mysql() {
     useradd mysql -g mysql -s /sbin/nologin
     mkdir $HOME/my_boost
     cd $HOME
-    wget http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.30.tar.gz
+    wget -O $HOME/mysql-5.7.30.tar.gz https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-5.7.30.tar.gz
     tar -zxvf $HOME/mysql-5.7.30.tar.gz
     mkdir $HOME/mysql-5.7.30/bld
     cd $HOME/mysql-5.7.30/bld
@@ -75,7 +75,7 @@ compile_mysql() {
     -DFORCE_UNSUPPORTED_COMPILER=1 \
     -DIGNORE_AIO_CHECK=1 \
     -DMYSQL_MAINTAINER_MODE=0 \
-    -DWITH_BOOST=/root/my_boost \
+    -DWITH_BOOST=/root/mysql-5.7.30/boost \
     -DWITH_CURL=system \
     -DWITH_SSL=system \
     -DCMAKE_INSTALL_PREFIX=/usr/local/mysql/ \
