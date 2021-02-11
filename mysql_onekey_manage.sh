@@ -35,10 +35,10 @@ tools_install(){
 }
 
 compile_cmake() {
-    cd $HOME || exit
+    cd $HOME
     wget https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4.tar.gz
     tar -zxvf $HOME/cmake-3.19.4.tar.gz
-    cd $HOME/cmake-3.19.4 || exit
+    cd $HOME/cmake-3.19.4
     ./bootstrap
     make && make install
     cmake -version
@@ -57,28 +57,32 @@ remove_mdb() {
 compile_mysql() {
     groupadd mysql
     useradd mysql -g mysql -s /sbin/nologin
-    cd $HOME || exit
+    cd $HOME
     wget https://downloads.mysql.com/archives/get/p/23/file/mysql-5.7.30.tar.gz
     tar -zxvf $HOME/mysql-5.7.30.tar.gz
-    cd $HOME/mysql-5.7.30 || exit
-    cmake . -DCMAKE_USER=mysql \
+    cd $HOME/mysql-5.7.30
+    cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql/ \
+    -DCMAKE_USER=mysql \
     -DMYSQL_TCP_PORT=3306 \
-    -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
     -DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock \
     -DSYSCONFDIR=/etc \
-    -DSYSTEMD_PID_DIR=/usr/local/mysql \
+    -DSYSTEMD_PID_DIR=/usr/local/mysql/ \
     -DDEFAULT_CHARSET=utf8  \
     -DDEFAULT_COLLATION=utf8_general_ci \
+    -DWITH_EXTRA_CHARSETS=all \
     -DWITH_INNOBASE_STORAGE_ENGINE=1 \
     -DWITH_ARCHIVE_STORAGE_ENGINE=1 \
     -DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
     -DWITH_PERFSCHEMA_STORAGE_ENGINE=1 \
-    -DMYSQL_DATADIR=/usr/local/mysql/data \
+    -DWITH_READLINE=1 \
+    -DMYSQL_DATADIR=/usr/local/mysql/data/ \
     -DWITH_BOOST=boost \
     -DWITH_SYSTEMD=1 \
     -DWITH_DEBUG=0 \
     -DENABLE_PROFILING=1
+    make && make install
     chown -R mysql:mysql /usr/local/mysql/
+    /usr/local/mysql/mysql --version
     echo -e "PATH=/usr/local/mysql/bin:/usr/local/mysql/lib:$PATH\nexport PATH" >> /etc/profile
     source /etc/profile
     Green "编译安装 mysql 完成！"
