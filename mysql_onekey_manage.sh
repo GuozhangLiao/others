@@ -31,7 +31,7 @@ system_update(){
 #安装编译环境
 tools_install(){
     yum -y install gcc gcc-c++ ncurses ncurses-devel wget bison openssl-devel unzip
-    Green "编译工具安装完成！"
+    Green "依赖关系安装完成！"
 }
 
 #git连接加速
@@ -44,6 +44,7 @@ compile_cmake() {
     wget https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4.tar.gz
     tar -zxvf $HOME/cmake-3.19.4.tar.gz
     cd $HOME/cmake-3.19.4
+    Green "开始编译 cmake "
     ./bootstrap
     make && make install
     cmake -version
@@ -68,6 +69,7 @@ compile_mysql() {
     tar -zxvf $HOME/mysql-5.7.30.tar.gz
     mkdir $HOME/mysql-5.7.30/bld
     cd $HOME/mysql-5.7.30/bld
+    Green "开始编译 mysql-5.7.30 "
     cmake .. -DBUILD_CONFIG=mysql_release \
     -DCPACK_MONOLITHIC_INSTALL=0 \
     -DDOWNLOAD_BOOST=0 \
