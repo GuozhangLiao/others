@@ -70,7 +70,7 @@ compile_mysql() {
     cd $HOME/mysql-5.7.30/bld
     cmake .. -DBUILD_CONFIG=mysql_release \
     -DCPACK_MONOLITHIC_INSTALL=0 \
-    -DDOWNLOAD_BOOST=1 \
+    -DDOWNLOAD_BOOST=0 \
     -DDOWNLOAD_BOOST_TIMEOUT=1200 \
     -DFORCE_UNSUPPORTED_COMPILER=1 \
     -DIGNORE_AIO_CHECK=1 \
