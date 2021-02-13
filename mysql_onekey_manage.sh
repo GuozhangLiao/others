@@ -76,7 +76,7 @@ compile_mysql() {
     -DFORCE_UNSUPPORTED_COMPILER=1 \
     -DIGNORE_AIO_CHECK=1 \
     -DMYSQL_MAINTAINER_MODE=0 \
-    -DWITH_BOOST=boost \
+    -DWITH_BOOST=/root/mysql-5.7.30/boost \
     -DWITH_CURL=system \
     -DWITH_SSL=system \
     -DCMAKE_INSTALL_PREFIX=/usr/local/mysql/ \
