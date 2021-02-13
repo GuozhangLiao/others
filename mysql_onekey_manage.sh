@@ -63,15 +63,13 @@ remove_mdb() {
 compile_mysql() {
     groupadd mysql
     useradd mysql -g mysql -s /sbin/nologin
-    mkdir $HOME/my_boost
     cd $HOME
     wget -O $HOME/mysql-5.7.30.tar.gz https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-5.7.30.tar.gz
     tar -zxvf $HOME/mysql-5.7.30.tar.gz
     mkdir $HOME/mysql-5.7.30/bld
     cd $HOME/mysql-5.7.30/bld
     Green "开始编译 mysql-5.7.30 "
-    cmake .. -DBUILD_CONFIG=mysql_release \
-    -DCPACK_MONOLITHIC_INSTALL=0 \
+    cmake .. -DCPACK_MONOLITHIC_INSTALL=0 \
     -DENABLED_LOCAL_INFILE=1 \
     -DFORCE_UNSUPPORTED_COMPILER=1 \
     -DIGNORE_AIO_CHECK=1 \
@@ -81,7 +79,7 @@ compile_mysql() {
     -DWITH_SSL=system \
     -DCMAKE_INSTALL_PREFIX=/usr/local/mysql/ \
     -DCMAKE_USER=mysql \
-    -DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock \
+    -DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
     -DSYSCONFDIR=/etc \
     -DSYSTEMD_PID_DIR=/usr/local/mysql/ \
     -DDEFAULT_CHARSET=utf8  \
@@ -97,35 +95,34 @@ compile_mysql() {
     -DENABLE_PROFILING=1
     Green "开始安装 mysql"
     make && make install
+    touch /var/log/mysqld.log
     chown -R mysql:mysql /usr/local/mysql/
+    chown mysql:mysql /var/log/mysqld.log
     /usr/local/mysql/bin/mysql --version
     cat > /etc/my.cnf<<-EOF
 
 [client]
-port = 3306
+port=3306
 default-character-set=utf8
-socket = /usr/local/mysql/mysql.sock
+socket=/tmp/mysql.sock 
 
 [mysqld]
-user = mysql
-basedir = /usr/local/mysql
-datadir = /usr/local/mysql/data
-port = 3306
+user=mysql
+basedir=/usr/local/mysql
+datadir=/usr/local/mysql/data
+port=3306
 default-character-set=utf8
-socket = /usr/local/mysql/mysql.sock
-pid-file = /usr/local/mysql/mysqld.pid
+socket=/tmp/mysql.sock 
+pid-file=/usr/local/mysql/mysqld.pid
 log-error=/var/log/mysqld.log
-server-id = 1
+server-id=1
+explicit_defaults_for_timestamp=OFF
 EOF
     chown mysql:mysql /etc/my.cnf
     echo -e "PATH=/usr/local/mysql/bin:/usr/local/mysql/lib:$PATH\nexport PATH" >> /etc/profile
     source /etc/profile
     Green "编译安装 mysql 完成！"
-    mysqld \
-    --initialize-insecure \
-    --user=mysql \
-    --basedir=/usr/local/mysql \
-    --datadir=/usr/local/mysql/data
+    mysqld --defaults-file=/etc/my.cnf --collation-server=utf8_general_ci --initialize-insecure --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --explicit_defaults_for_timestamp=OFF
 }
 
 #main
