@@ -72,24 +72,25 @@ compile_mysql() {
     cmake .. -DCPACK_MONOLITHIC_INSTALL=0 \
     -DENABLED_LOCAL_INFILE=1 \
     -DFORCE_UNSUPPORTED_COMPILER=1 \
-    -DIGNORE_AIO_CHECK=1 \
     -DMYSQL_MAINTAINER_MODE=0 \
+    -DWITH_DEFAULT_FEATURE_SET=1 \
     -DWITH_BOOST=/root/mysql-5.7.30/boost \
     -DWITH_CURL=system \
     -DWITH_SSL=system \
-    -DCMAKE_INSTALL_PREFIX=/usr/local/mysql/ \
+    -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
     -DCMAKE_USER=mysql \
-    -DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
+    -DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock \
     -DSYSCONFDIR=/etc \
     -DSYSTEMD_PID_DIR=/usr/local/mysql/ \
     -DDEFAULT_CHARSET=utf8  \
     -DDEFAULT_COLLATION=utf8_general_ci \
     -DWITH_EXTRA_CHARSETS=all \
+    -DWITH_INNOBASE_STORAGE_ENGINE=1 \
     -DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
     -DWITH_ARCHIVE_STORAGE_ENGINE=1 \
     -DWITH_PERFSCHEMA_STORAGE_ENGINE=1 \
     -DWITH_READLINE=1 \
-    -DMYSQL_DATADIR=/usr/local/mysql/data/ \
+    -DMYSQL_DATADIR=/usr/local/mysql/data \
     -DWITH_SYSTEMD=1 \
     -DWITH_DEBUG=0 \
     -DENABLE_PROFILING=1
@@ -101,28 +102,28 @@ compile_mysql() {
     /usr/local/mysql/bin/mysql --version
     cat > /etc/my.cnf<<-EOF
 
-[client]
-port=3306
+[mysql]
 default-character-set=utf8
-socket=/tmp/mysql.sock 
+socket=/usr/local/mysql/mysql.sock
 
 [mysqld]
 user=mysql
 basedir=/usr/local/mysql
 datadir=/usr/local/mysql/data
 port=3306
-default-character-set=utf8
-socket=/tmp/mysql.sock 
+character-set-server=utf8
+socket=/usr/local/mysql/mysql.sock 
 pid-file=/usr/local/mysql/mysqld.pid
 log-error=/var/log/mysqld.log
 server-id=1
-explicit_defaults_for_timestamp=OFF
+explicit_defaults_for_timestamp
+default_storage_engine=InnoDB
 EOF
     chown mysql:mysql /etc/my.cnf
     echo -e "PATH=/usr/local/mysql/bin:/usr/local/mysql/lib:$PATH\nexport PATH" >> /etc/profile
     source /etc/profile
     Green "编译安装 mysql 完成！"
-    mysqld --defaults-file=/etc/my.cnf --collation-server=utf8_general_ci --initialize-insecure --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --explicit_defaults_for_timestamp=OFF
+    /usr/local/mysql/bin/mysqld --defaults-file=/etc/my.cnf --collation-server=utf8_general_ci --initialize-insecure --user=mysql
 }
 
 #main
