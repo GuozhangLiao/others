@@ -64,6 +64,8 @@ remove_mdb() {
 compile_mysql() {
     groupadd mysql
     useradd mysql -g mysql -s /sbin/nologin
+    mkdir /usr/local/mysql
+    mkdir /usr/local/mysql/data
     cd $HOME
     wget -O $HOME/mysql-5.7.30.tar.gz https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-5.7.30.tar.gz
     tar -zxvf $HOME/mysql-5.7.30.tar.gz
@@ -99,7 +101,7 @@ compile_mysql() {
     chown -R mysql:mysql /usr/local/mysql/
     /usr/local/mysql/bin/mysql --version
     cat > /etc/my.cnf<<-EOF
-mysqld]
+[mysqld]
 basedir=/usr/local/mysql
 datadir=/usr/local/mysql/data
 pid-file=/usr/local/mysql/data/mysqld.pid
@@ -111,11 +113,8 @@ character-set-server=utf8
 server-id=1
 EOF
     chown mysql:mysql /etc/my.cnf
-    echo -e "PATH=/usr/local/mysql/bin:/usr/local/mysql/lib:$PATH\nexport PATH" >> /etc/profile
-    source /etc/profile
-    Green "编译安装 mysql 完成！"
     /usr/local/mysql/bin/mysqld --defaults-file=/etc/my.cnf --initialize --user=mysql
-       cat > /etc/systemd/system/mysql.service<<-EOF
+    cat > /etc/systemd/system/mysql.service<<-EOF
 [Unit]
 Description=MySQL Server
 After=network.target
@@ -156,6 +155,8 @@ PrivateTmp=false
 [Install]
 WantedBy=multi-user.target
 EOF
+    echo -e "PATH=/usr/local/mysql/bin:/usr/local/mysql/lib:$PATH\nexport PATH" >> /etc/profile
+    Green "编译安装 mysql 完成！"
 }
 
 #main
