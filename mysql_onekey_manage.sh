@@ -36,7 +36,8 @@ tools_install(){
 
 #git连接加速
 higher_speed(){
-    echo "185.199.109.154  github-releases.githubusercontent.com" >> /etc/hosts
+    echo -e "199.232.28.133       raw.githubusercontent.com" >> /etc/hosts
+    echo -e "nameserver  8.8.8.8\nnameserver  8.8.4.4" >> /etc/resolv.conf
 }
 
 compile_cmake() {
@@ -73,7 +74,6 @@ compile_mysql() {
     -DENABLED_LOCAL_INFILE=1 \
     -DFORCE_UNSUPPORTED_COMPILER=1 \
     -DMYSQL_MAINTAINER_MODE=0 \
-    -DWITH_DEFAULT_FEATURE_SET=1 \
     -DWITH_BOOST=/root/mysql-5.7.30/boost \
     -DWITH_CURL=system \
     -DWITH_SSL=system \
@@ -85,10 +85,10 @@ compile_mysql() {
     -DDEFAULT_CHARSET=utf8  \
     -DDEFAULT_COLLATION=utf8_general_ci \
     -DWITH_EXTRA_CHARSETS=all \
+    -DWITH_MYISAM_STORAGE_ENGINE=1 \
     -DWITH_INNOBASE_STORAGE_ENGINE=1 \
     -DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
     -DWITH_ARCHIVE_STORAGE_ENGINE=1 \
-    -DWITH_PERFSCHEMA_STORAGE_ENGINE=1 \
     -DWITH_READLINE=1 \
     -DMYSQL_DATADIR=/usr/local/mysql/data \
     -DWITH_SYSTEMD=1 \
@@ -96,40 +96,72 @@ compile_mysql() {
     -DENABLE_PROFILING=1
     Green "开始安装 mysql"
     make && make install
-    touch /var/log/mysqld.log
     chown -R mysql:mysql /usr/local/mysql/
-    chown mysql:mysql /var/log/mysqld.log
     /usr/local/mysql/bin/mysql --version
     cat > /etc/my.cnf<<-EOF
-
-[mysql]
-default-character-set=utf8
-socket=/usr/local/mysql/mysql.sock
-
-[mysqld]
-user=mysql
+mysqld]
 basedir=/usr/local/mysql
 datadir=/usr/local/mysql/data
+pid-file=/usr/local/mysql/data/mysqld.pid
+log-error=/usr/local/mysql/data/mysql.err
+socket=/usr/local/mysql/mysql.sock
+user=mysql
 port=3306
 character-set-server=utf8
-socket=/usr/local/mysql/mysql.sock 
-pid-file=/usr/local/mysql/mysqld.pid
-log-error=/var/log/mysqld.log
 server-id=1
-explicit_defaults_for_timestamp
-default_storage_engine=InnoDB
 EOF
     chown mysql:mysql /etc/my.cnf
     echo -e "PATH=/usr/local/mysql/bin:/usr/local/mysql/lib:$PATH\nexport PATH" >> /etc/profile
     source /etc/profile
     Green "编译安装 mysql 完成！"
-    /usr/local/mysql/bin/mysqld --defaults-file=/etc/my.cnf --collation-server=utf8_general_ci --initialize-insecure --user=mysql
+    /usr/local/mysql/bin/mysqld --defaults-file=/etc/my.cnf --initialize --user=mysql
+       cat > /etc/systemd/system/mysql.service<<-EOF
+[Unit]
+Description=MySQL Server
+After=network.target
+After=syslog.target
+
+[Service]
+Type=forking
+
+User=mysql
+Group=mysql
+
+PIDFile=/usr/local/mysql/data/mysqld.pid
+
+# Disable service start and stop timeout logic of systemd for mysqld service.
+TimeoutSec=0
+
+# Execute pre and post scripts as root
+PermissionsStartOnly=true
+
+# Needed to create system tables
+#ExecStartPre=/usr/bin/mysqld_pre_systemd
+
+# Start main service
+ExecStart=/usr/local/mysql/bin/mysqld --daemonize --pid-file=/usr/local/mysql/data/mysqld.pid
+ 
+# Use this to switch malloc implementation
+#EnvironmentFile=-/etc/sysconfig/mysql
+
+# Sets open_files_limit
+LimitNOFILE = 5000
+
+Restart=on-failure
+
+RestartPreventExitStatus=1
+
+PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target
+EOF
 }
 
 #main
 system_update
 tools_install
-#higher_speed
+higher_speed
 compile_cmake
 remove_mdb
 compile_mysql
