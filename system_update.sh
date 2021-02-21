@@ -35,6 +35,7 @@ Action (){
 }
 
 Main (){
+    check_dst
     Action update
     Action safe-upgrade
     Blue "---------------\n系统升级完成\n---------------"
@@ -45,6 +46,5 @@ Main (){
     Blue "---------------\n所以任务完成\n---------------"
 }
 
-check_dst
 Main > $logdst/$udlog
 
