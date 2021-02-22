@@ -8,8 +8,9 @@
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:~/bin
 export PATH
-timer=$(date  +'%Y%m%d%H%M')
-udlog="system_update_$timer.log"
+timer1=$(date  +'%Y%m%d%H%M')
+timer2=$(date "+%F %T")
+udlog="system_update_$timer1.log"
 logdst="/home/aliao/update_log"
 kcmd="aptitude"
 
@@ -22,9 +23,9 @@ Blue(){
 check_dst(){
     if [ -d $logdst ]
     then
-        Blue "---------------\n系统更新任务进行中...\n---------------"
+        Blue "---------------\n系统更新任务进行中...\n---------------$timer2"
     else
-        Blue "---------------\n日志路径不存在，现在创建...\n---------------"
+        Blue "---------------\n日志路径不存在，现在创建...\n---------------$timer2"
         mkdir $logdst
     fi
 }
@@ -38,12 +39,12 @@ Main (){
     check_dst
     Action update
     Action safe-upgrade
-    Blue "---------------\n系统升级完成\n---------------"
+    Blue "---------------\n系统升级完成\n---------------$timer2"
     Action clean
 
     local kcmd="apt-get"
     Action autoremove
-    Blue "---------------\n所以任务完成\n---------------"
+    Blue "---------------\n所以任务完成\n---------------$timer2"
 }
 
 Main > $logdst/$udlog
