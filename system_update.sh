@@ -19,14 +19,33 @@ Blue(){
     echo -e "\033[34;01m$1\033[0m"
 }
 
+Red(){
+    echo -e "\033[31;01m$1\033[0m"
+}
+
 #检查路径是否存在
 check_dst(){
     if [ -d $logdst ]
     then
-        Blue "---------------\n系统更新任务进行中...\n---------------$timer2"
+        Blue "-------------------------\n系统更新任务进行中...\n-------------------------$timer2"
     else
-        Blue "---------------\n日志路径不存在，现在创建...\n---------------$timer2"
+        Blue "-------------------------\n日志路径不存在，现在创建...\n-------------------------$timer2"
         mkdir $logdst
+    fi
+}
+
+#检查网络是否连接
+check_network(){
+    ping -c 1 mirrors.aliyun.www > /dev/null 2>&1
+    a=$?
+    ping -c 1 mirrors.tuna.tsinghua.edu.cn > /dev/null 2>&1
+    b=$?
+    if [ $a -eq 0 ] || [ $b -eq 0 ] 
+    then
+        Blue "-------------------------\n网络连接正常，开始更新系统\n-------------------------$timer2"
+    else
+        Red "-------------------------\n设备离线，请检查网络连接是否正常!\n系统更新任务失败！\n-------------------------$timer2"
+        exit 1
     fi
 }
 
@@ -36,16 +55,16 @@ Action (){
 }
 
 Main (){
+    check_network
     check_dst
     Action update
     Action safe-upgrade
-    Blue "---------------\n系统升级完成\n---------------$timer2"
+    Blue "-------------------------\n系统升级完成\n-------------------------$timer2"
     Action clean
 
     local kcmd="apt-get"
     Action autoremove
-    Blue "---------------\n所以任务完成\n---------------$timer2"
+    Blue "-------------------------\n所以任务完成\n-------------------------$timer2"
 }
 
 Main > $logdst/$udlog
-
