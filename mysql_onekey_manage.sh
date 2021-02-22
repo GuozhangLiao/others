@@ -157,6 +157,7 @@ WantedBy=multi-user.target
 EOF
     chmod 644 /etc/systemd/system/mysql.service
     echo -e "PATH=/usr/local/mysql/bin:/usr/local/mysql/lib:$PATH\nexport PATH" >> /etc/profile
+    . /etc/profile
     Green "编译安装 mysql 完成！"
 }
 

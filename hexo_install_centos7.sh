@@ -58,7 +58,7 @@ compile_nodejs(){
     node -v
     npm -v
     echo -e "export NODE_HOME=$nodedst\nexport PATH=\$NODE_HOME/bin:\$PATH"
-    source /etc/profile
+    . /etc/profile
     clear
     node -v
     npm -v
