@@ -11,7 +11,7 @@ export PATH
 timer1=$(date  +'%Y%m%d%H%M')
 timer2=$(date "+%F %T")
 udlog="system_update_$timer1.log"
-logdst="/home/aliao/update_log"
+logdst="$HOME/update_log"
 kcmd="aptitude"
 
 #颜色
@@ -37,9 +37,9 @@ check_dst(){
 #检查网络是否连接
 check_network(){
     ping -c 1 mirrors.aliyun.www > /dev/null 2>&1
-    a=$?
+    local a=$?
     ping -c 1 mirrors.tuna.tsinghua.edu.cn > /dev/null 2>&1
-    b=$?
+    local b=$?
     if [ $a -eq 0 ] || [ $b -eq 0 ] 
     then
         Blue "-------------------------\n网络连接正常，开始更新系统\n-------------------------$timer2"
