@@ -9,7 +9,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:~/bin
 export PATH
 timer1=$(date  +'%Y%m%d%H%M')
-timer2=$(date "+%F %T")
+#timer2=$(date "+%F %T")
 udlog="system_update_$timer1.log"
 logdst="$HOME/update_log"
 kcmd="aptitude"
@@ -27,9 +27,9 @@ Red(){
 check_dst(){
     if [ -d $logdst ]
     then
-        Blue "-------------------------\n系统更新任务进行中...\n-------------------------$timer2"
+        Blue "-------------------------\n系统更新任务进行中...\n-------------------------$(date "+%F %T")"
     else
-        Blue "-------------------------\n日志路径不存在，现在创建...\n-------------------------$timer2"
+        Blue "-------------------------\n日志路径不存在，现在创建...\n-------------------------$(date "+%F %T")"
         mkdir $logdst
     fi
 }
@@ -42,9 +42,9 @@ check_network(){
     local b=$?
     if [ $a -eq 0 ] || [ $b -eq 0 ] 
     then
-        Blue "-------------------------\n网络连接正常，开始更新系统\n-------------------------$timer2"
+        Blue "-------------------------\n网络连接正常，开始更新系统\n-------------------------$(date "+%F %T")"
     else
-        Red "-------------------------\n设备离线，请检查网络连接是否正常!\n系统更新任务失败！\n-------------------------$timer2"
+        Red "-------------------------\n设备离线，请检查网络连接是否正常!\n系统更新任务失败！\n-------------------------$(date "+%F %T")"
         exit 1
     fi
 }
@@ -59,12 +59,12 @@ Main (){
     check_dst
     Action update
     Action safe-upgrade
-    Blue "-------------------------\n系统升级完成\n-------------------------$timer2"
+    Blue "-------------------------\n系统升级完成\n-------------------------$(date "+%F %T")"
     Action clean
 
     local kcmd="apt-get"
     Action autoremove
-    Blue "-------------------------\n所以任务完成\n-------------------------$timer2"
+    Blue "-------------------------\n所以任务完成\n-------------------------$(date "+%F %T")"
 }
 
 Main > $logdst/$udlog
