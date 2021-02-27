@@ -36,7 +36,7 @@ check_dst(){
 
 #检查网络是否连接
 check_network(){
-    ping -c 1 mirrors.aliyun.www > /dev/null 2>&1
+    ping -c 1 mirrors.aliyun.com > /dev/null 2>&1
     local a=$?
     ping -c 1 mirrors.tuna.tsinghua.edu.cn > /dev/null 2>&1
     local b=$?
