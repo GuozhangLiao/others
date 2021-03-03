@@ -21,6 +21,32 @@ Blue(){
     echo -e "\033[34;01m$1\033[0m"
 }
 
+#检查用户
+check_user() {
+    if [ $(id -u) -eq 0 ]
+    then
+        Blue "当前用户为root用户！"
+    else
+        Red "当前用户权限不足，请使用root用户执行脚本！"
+        exit 1
+    fi
+    
+    if ！ grep ^www /etc/passwd
+    then
+        groupadd www
+        useradd -g www www -s /sbin/nologin
+    else
+        Red "用户www已经存在，无需创建"
+    fi
+    
+    for nmp in nginx mysql php
+    do
+        mkdir -p /www/$nmp
+    done
+}
+
+
+
 #更新系统
 system_update(){
     yum update -y
@@ -104,9 +130,6 @@ remove_mdb() {
 
 #编译nginx
 nginx_compile(){
-    groupadd www
-    useradd -g www www -s /sbin/nologin
-    mkdir -p /www/nginx
     cd $HOME
     wget http://nginx.org/download/nginx-1.18.0.tar.gz
     tar -zxvf $HOME/nginx-1.18.0.tar.gz
@@ -146,8 +169,6 @@ EOF
 
 #编译安装mysql
 compile_mysql(){
-    mkdir /www/mysql
-    mkdir /www/mysql/data
     cd $HOME
     wget -O $HOME/mysql-5.7.30.tar.gz https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-5.7.30.tar.gz
     tar -zxvf $HOME/mysql-5.7.30.tar.gz
@@ -242,7 +263,6 @@ EOF
 
 #编译安装php
 compile_php(){
-    mkdir /www/php
     cd $HOME
     wget https://mirrors.sohu.com/php/php-7.4.15.tar.gz
     tar -zxf $HOME/php-7.4.15.tar.gz
