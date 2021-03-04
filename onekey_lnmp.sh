@@ -22,7 +22,7 @@ Blue(){
 }
 
 #检查用户
-check_user() {
+check_user(){
     if [ $(id -u) -eq 0 ]
     then
         Blue "当前用户为root用户！"
@@ -38,14 +38,12 @@ check_user() {
     else
         Red "用户www已经存在，无需创建"
     fi
-    
+
     for nmp in nginx mysql php
     do
         mkdir -p /www/$nmp
     done
 }
-
-
 
 #更新系统
 system_update(){
@@ -119,7 +117,7 @@ remove_old_version(){
 }
 
 #卸载 mariadb
-remove_mdb() {
+remove_mdb(){
     if rpm -qa | grep mariadb
     then
         local mb=$(rpm -qa | grep mariadb)
@@ -217,33 +215,32 @@ EOF
     cat > /etc/systemd/system/mysql.service<<-EOF
 [Unit]
 Description=MySQL Server
+Documentation=man:mysqld(8)
+Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
 After=network.target
 After=syslog.target
 
-[Service]
-Type=forking
+[Install]
+WantedBy=multi-user.target
 
+[Service]
 User=www
 Group=www
 
+Type=forking
+
 PIDFile=/www/mysql/data/mysqld.pid
 
-# Disable service start and stop timeout logic of systemd for mysqld service.
 TimeoutSec=0
 
-# Execute pre and post scripts as root
 PermissionsStartOnly=true
 
-# Needed to create system tables
-#ExecStartPre=/usr/bin/mysqld_pre_systemd
+#ExecStartPre=@bindir@/mysqld_pre_systemd
 
-# Start main service
 ExecStart=/www/mysql/bin/mysqld --daemonize --pid-file=/www/mysql/data/mysqld.pid
- 
-# Use this to switch malloc implementation
+
 #EnvironmentFile=-/etc/sysconfig/mysql
 
-# Sets open_files_limit
 LimitNOFILE = 5000
 
 Restart=on-failure
@@ -251,9 +248,6 @@ Restart=on-failure
 RestartPreventExitStatus=1
 
 PrivateTmp=false
-
-[Install]
-WantedBy=multi-user.target
 EOF
     chmod 644 /etc/systemd/system/mysql.service
     chown www:www /etc/my.cnf
@@ -337,9 +331,49 @@ compile_php(){
     --with-pear \
     --enable-opcache
     make && make install
-    cp php.ini-production /etc/php.ini
-    cp /www/php/etc/php-fpm.conf.default /www/php/etc/php-fpm.conf
-    cp /www/php/etc/php-fpm.d/www.conf.default /www/php/etc/php-fpm.d/www.conf
     /www/php/bin/php -v
-    
+    cp php.ini-production /etc/php.ini
+    chown www:www /etc/php.ini
+    cp /www/php/etc/php-fpm.conf.default /www/php/etc/php-fpm.conf
+    sed -i '/pid =/cpid = \/var\/run\/php-fpm.pid' /www/php/etc/php-fpm.conf
+    cp /www/php/etc/php-fpm.d/www.conf.default /www/php/etc/php-fpm.d/www.conf
+    cat > /etc/systemd/system/php-fpm.service<<-EOF
+[Unit]
+Description=The PHP FastCGI Process Manager
+After=network.target
+
+[Service]
+Type=simple
+PIDFile=/var/run/php-fpm.pid
+ExecStart=/www/php/sbin/php-fpm --nodaemonize --fpm-config /www/php/etc/php-fpm.conf
+ExecReload=/bin/kill -USR2 $MAINPID
+
+PrivateTmp=true
+
+ProtectSystem=full
+
+PrivateDevices=true
+
+ProtectKernelModules=true
+
+ProtectKernelTunables=true
+
+ProtectControlGroups=true
+
+RestrictRealtime=true
+
+RestrictAddressFamilies=AF_INET AF_INET6 AF_NETLINK AF_UNIX
+
+RestrictNamespaces=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    chmod 644 /etc/systemd/system/php-fpm.service
+    mkdir /www/php/tmp
+    sed -i '/session.save_path = "\/tmp"/csession.save_path = "\/www\/php\/tmp"' /etc/php.ini
+    sed -i '/date.timezone =/cdate.timezone = PRC' /etc/php.ini
+    sed -i '/expose_php =/s/On/Off/g' /etc/php.ini
+    sed -i '/^user = nobody/s/nobody/www/g;/^group = nobody/s/nobody/www/g' /www/php/etc/php-fpm.d/www.conf
+
 }
