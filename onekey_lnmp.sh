@@ -138,11 +138,22 @@ nginx_compile(){
     --user=www \
     --group=www \
     --prefix=/www/nginx \
+    --conf-path=/ect/nginx/nginx.conf \
+    --error-log-path=/var/log/nginx/error.log \
+    --http-log-path=/var/log/nginx/access.log \
+    --pid-path=/var/run/nginx.pid \
     --with-http_ssl_module \
     --with-http_stub_status_module \
     --with-http_realip_module \
+    --with-http_gzip_static_module \
+    --http-client-body-temp-path=/var/tmp/nginx/client/ \
+    --http-proxy-temp-path=/var/tmp/nginx/proxy/ \
+    --http-fastcgi-temp-path=/var/tmp/nginx/fcgi/ \
+    --http-uwsgi-temp-path=/var/tmp/nginx/uwsgi \
+    --http-scgi-temp-path=/var/tmp/nginx/scgi \
     --with-threads
     make && make install
+    
     /www/nginx/sbin/nginx -V
     ln -s /www/nginx/sbin/nginx /usr/bin/nginx
     cat > /etc/systemd/system/nginx.service<<-EOF
@@ -153,7 +164,7 @@ After=syslog.target network.target remote-fs.target nss-lookup.target
  
 [Service]
 Type=forking
-PIDFile=/www/nginx/logs/nginx.pid  
+PIDFile=/var/run/nginx.pid 
 ExecStartPre=/www/nginx/sbin/nginx -t
 ExecStart=/www/nginx/sbin/nginx -c /www/nginx/conf/nginx.conf
 ExecReload=/www/nginx/sbin/nginx -s reload
@@ -164,7 +175,7 @@ PrivateTmp=true
 WantedBy=multi-user.target
 EOF
     chmod 644 /etc/systemd/system/nginx.service
-    chown -R www:www /www
+    chown -R www:www /www /etc/nginx
     systemctl start nginx
     Green "nginx 编译安装完成！"
 }
@@ -254,7 +265,7 @@ RestartPreventExitStatus=1
 PrivateTmp=false
 EOF
     chmod 644 /etc/systemd/system/mysql.service
-    chown -R www:www /www 
+    chown -R www:www /www
     chown www:www /etc/my.cnf
     systemctl start mysqld
     /www/mysql/bin/mysqld --defaults-file=/etc/my.cnf --initialize --user=www
