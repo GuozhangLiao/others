@@ -130,15 +130,14 @@ remove_mdb(){
 
 #编译nginx
 nginx_compile(){
-    cd $HOME
-    wget -O $HOME/nginx-1.18.0.tar.gz http://mirrors.sohu.com/nginx/nginx-1.18.0.tar.gz
-    tar -zxvf $HOME/nginx-1.18.0.tar.gz
-    cd $HOME/nginx-1.18.0
+    cd "$HOME"
+    wget -O "$HOME"/nginx-1.18.0.tar.gz http://mirrors.sohu.com/nginx/nginx-1.18.0.tar.gz
+    tar -zxvf "$HOME"/nginx-1.18.0.tar.gz
+    cd "$HOME"/nginx-1.18.0
     ./configure \
     --user=www \
     --group=www \
     --prefix=/www/nginx \
-    --conf-path=/ect/nginx/nginx.conf \
     --error-log-path=/var/log/nginx/error.log \
     --http-log-path=/var/log/nginx/access.log \
     --pid-path=/var/run/nginx.pid \
@@ -146,14 +145,9 @@ nginx_compile(){
     --with-http_stub_status_module \
     --with-http_realip_module \
     --with-http_gzip_static_module \
-    --http-client-body-temp-path=/var/tmp/nginx/client/ \
-    --http-proxy-temp-path=/var/tmp/nginx/proxy/ \
-    --http-fastcgi-temp-path=/var/tmp/nginx/fcgi/ \
-    --http-uwsgi-temp-path=/var/tmp/nginx/uwsgi \
-    --http-scgi-temp-path=/var/tmp/nginx/scgi \
-    --with-threads
+    --with-threads \
+    --with-pcre
     make && make install
-    
     /www/nginx/sbin/nginx -V
     ln -s /www/nginx/sbin/nginx /usr/bin/nginx
     cat > /etc/systemd/system/nginx.service<<-EOF
@@ -175,18 +169,18 @@ PrivateTmp=true
 WantedBy=multi-user.target
 EOF
     chmod 644 /etc/systemd/system/nginx.service
-    chown -R www:www /www /etc/nginx
+    chown -R www:www /www
     systemctl start nginx
     Green "nginx 编译安装完成！"
 }
 
 #编译安装mysql
 compile_mysql(){
-    cd $HOME
-    wget -O $HOME/mysql-5.7.30.tar.gz http://mirrors.sohu.com/mysql/MySQL-5.7/mysql-boost-5.7.30.tar.gz
-    tar -zxvf $HOME/mysql-5.7.30.tar.gz
-    mkdir $HOME/mysql-5.7.30/bld
-    cd $HOME/mysql-5.7.30/bld
+    cd "$HOME"
+    wget -O "$HOME"/mysql-5.7.30.tar.gz http://mirrors.sohu.com/mysql/MySQL-5.7/mysql-boost-5.7.30.tar.gz
+    tar -zxvf "$HOME"/mysql-5.7.30.tar.gz
+    mkdir "$HOME"/mysql-5.7.30/bld
+    cd "$HOME"/mysql-5.7.30/bld
     Green "开始编译 mysql-5.7.30 "
     cmake .. -DCPACK_MONOLITHIC_INSTALL=0 \
     -DENABLED_LOCAL_INFILE=1 \
@@ -274,10 +268,10 @@ EOF
 
 #编译安装php
 compile_php(){
-    cd $HOME
+    cd "$HOME"
     wget https://mirrors.sohu.com/php/php-7.4.15.tar.gz
-    tar -zxf $HOME/php-7.4.15.tar.gz
-    cd $HOME/php-7.4.15
+    tar -zxf "$HOME"/php-7.4.15.tar.gz
+    cd "$HOME"/php-7.4.15
     ./configure \
     --prefix=/www/php \
     --with-fpm-user=www \
