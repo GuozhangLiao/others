@@ -30,8 +30,8 @@ check_user(){
         Red "当前用户权限不足，请使用root用户执行脚本！"
         exit 1
     fi
-    
-    if ！ grep ^www /etc/passwd
+    grep ^www /etc/passwd
+    if [ $? -ne 0 ]
     then
         groupadd www
         useradd -g www www -s /sbin/nologin
@@ -49,6 +49,8 @@ check_user(){
 system_update(){
     yum update -y
     yum install -y epel-release
+    yum clean all
+    yum makecache
     Green "升级系统完成！"
 }
 
@@ -129,7 +131,7 @@ remove_mdb(){
 #编译nginx
 nginx_compile(){
     cd $HOME
-    wget http://nginx.org/download/nginx-1.18.0.tar.gz
+    wget -O $HOME/nginx-1.18.0.tar.gz http://mirrors.sohu.com/nginx/nginx-1.18.0.tar.gz
     tar -zxvf $HOME/nginx-1.18.0.tar.gz
     cd $HOME/nginx-1.18.0
     ./configure \
@@ -162,13 +164,15 @@ PrivateTmp=true
 WantedBy=multi-user.target
 EOF
     chmod 644 /etc/systemd/system/nginx.service
+    chown -R www:www /www
+    systemctl start nginx
     Green "nginx 编译安装完成！"
 }
 
 #编译安装mysql
 compile_mysql(){
     cd $HOME
-    wget -O $HOME/mysql-5.7.30.tar.gz https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-5.7.30.tar.gz
+    wget -O $HOME/mysql-5.7.30.tar.gz http://mirrors.sohu.com/mysql/MySQL-5.7/mysql-boost-5.7.30.tar.gz
     tar -zxvf $HOME/mysql-5.7.30.tar.gz
     mkdir $HOME/mysql-5.7.30/bld
     cd $HOME/mysql-5.7.30/bld
@@ -250,7 +254,9 @@ RestartPreventExitStatus=1
 PrivateTmp=false
 EOF
     chmod 644 /etc/systemd/system/mysql.service
+    chown -R www:www /www 
     chown www:www /etc/my.cnf
+    systemctl start mysqld
     /www/mysql/bin/mysqld --defaults-file=/etc/my.cnf --initialize --user=www
     Green "编译安装 mysql 完成！"
 }
@@ -332,11 +338,167 @@ compile_php(){
     --enable-opcache
     make && make install
     /www/php/bin/php -v
-    cp php.ini-production /etc/php.ini
+    cat > /etc/php.ini<<-EOF
+[PHP]
+engine = On
+short_open_tag = On
+precision = 14
+output_buffering = 4096
+zlib.output_compression = Off
+implicit_flush = Off
+unserialize_callback_func =
+serialize_precision = -1
+disable_functions = passthru,exec,system,putenv,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,readlink,symlink,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv
+disable_classes =
+zend.enable_gc = On
+zend.exception_ignore_args = On
+expose_php = Off
+max_execution_time = 300
+max_input_time = 60
+memory_limit = 128M
+error_reporting = E_ALL & ~E_NOTICE
+display_errors = On
+display_startup_errors = Off
+log_errors = On
+log_errors_max_len = 1024
+ignore_repeated_errors = Off
+ignore_repeated_source = Off
+report_memleaks = On
+variables_order = "GPCS"
+request_order = "GP"
+register_argc_argv = Off
+auto_globals_jit = On
+post_max_size = 50M
+auto_prepend_file =
+auto_append_file =
+default_mimetype = "text/html"
+default_charset = "UTF-8"
+doc_root =
+user_dir =
+enable_dl = Off
+cgi.fix_pathinfo = 1
+file_uploads = On
+upload_max_filesize = 50M
+max_file_uploads = 20
+allow_url_fopen = On
+allow_url_include = Off
+default_socket_timeout = 60
+[CLI Server]
+cli_server.color = On
+[Date]
+date.timezone = PRC
+[Pdo_mysql]
+pdo_mysql.default_socket=
+[mail function]
+SMTP = localhost
+smtp_port = 25
+sendmail_path = /usr/sbin/sendmail -t -i
+mail.add_x_header = Off
+[ODBC]
+odbc.allow_persistent = On
+odbc.check_persistent = On
+odbc.max_persistent = -1
+odbc.max_links = -1
+odbc.defaultlrl = 4096
+odbc.defaultbinmode = 1
+[MySQLi]
+mysqli.max_persistent = -1
+mysqli.allow_persistent = On
+mysqli.max_links = -1
+mysqli.default_port = 3306
+mysqli.default_socket =
+mysqli.default_host =
+mysqli.default_user =
+mysqli.default_pw =
+mysqli.reconnect = Off
+[mysqlnd]
+mysqlnd.collect_statistics = On
+mysqlnd.collect_memory_statistics = Off
+[PostgreSQL]
+pgsql.allow_persistent = On
+pgsql.auto_reset_persistent = Off
+pgsql.max_persistent = -1
+pgsql.max_links = -1
+pgsql.ignore_notice = 0
+pgsql.log_notice = 0
+[bcmath]
+bcmath.scale = 0
+[Session]
+session.save_handler = files
+session.use_strict_mode = 0
+session.use_cookies = 1
+session.use_only_cookies = 1
+session.name = PHPSESSID
+session.auto_start = 0
+session.cookie_lifetime = 0
+session.cookie_path = /
+session.cookie_domain =
+session.cookie_httponly =
+session.cookie_samesite =
+session.serialize_handler = php
+session.gc_probability = 1
+session.gc_divisor = 1000
+session.gc_maxlifetime = 1440
+session.referer_check =
+session.cache_limiter = nocache
+session.cache_expire = 180
+session.use_trans_sid = 0
+session.sid_length = 26
+session.trans_sid_tags = "a=href,area=href,frame=src,form="
+session.sid_bits_per_character = 5
+[Assertion]
+zend.assertions = -1
+[Tidy]
+tidy.clean_output = Off
+[soap]
+soap.wsdl_cache_enabled=1
+soap.wsdl_cache_dir="/tmp"
+soap.wsdl_cache_ttl=86400
+soap.wsdl_cache_limit = 5
+[ldap]
+ldap.max_links = -1
+[curl]
+curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt
+[openssl]
+openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt
+[ffi]
+extension = zip.so
+[Zend Opcache]
+zend_extension=/www/php/lib/php/extensions/no-debug-non-zts-20190902/opcache.so
+opcache.enable = 1
+opcache.memory_consumption=128
+opcache.interned_strings_buffer=32
+opcache.max_accelerated_files=80000
+opcache.revalidate_freq=3
+opcache.fast_shutdown=1
+opcache.enable_cli=1
+EOF
     chown www:www /etc/php.ini
-    cp /www/php/etc/php-fpm.conf.default /www/php/etc/php-fpm.conf
-    sed -i '/pid =/cpid = \/var\/run\/php-fpm.pid' /www/php/etc/php-fpm.conf
-    cp /www/php/etc/php-fpm.d/www.conf.default /www/php/etc/php-fpm.d/www.conf
+    cat > /www/php/etc/php-fpm.conf<<-EOF
+[global]
+pid = /var/run/php-fpm.pid
+error_log = /www/php/var/log/php-fpm.log
+log_level = notice
+[www]
+listen = /tmp/php-cgi-74.sock
+listen.backlog = 8192
+listen.allowed_clients = 127.0.0.1
+listen.owner = www
+listen.group = www
+listen.mode = 0666
+user = www
+group = www
+pm = dynamic
+pm.status_path = /phpfpm_status
+pm.max_children = 30
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 10
+request_terminate_timeout = 100
+request_slowlog_timeout = 30
+slowlog = var/log/slow.lo
+include=/www/php/etc/php-fpm.d/*.conf
+EOF
     cat > /etc/systemd/system/php-fpm.service<<-EOF
 [Unit]
 Description=The PHP FastCGI Process Manager
@@ -375,5 +537,19 @@ EOF
     sed -i '/date.timezone =/cdate.timezone = PRC' /etc/php.ini
     sed -i '/expose_php =/s/On/Off/g' /etc/php.ini
     sed -i '/^user = nobody/s/nobody/www/g;/^group = nobody/s/nobody/www/g' /www/php/etc/php-fpm.d/www.conf
-
+    chown -R www:www /www
+    echo -e "PATH=/www/mysql/bin:/www/mysql/lib:/www/php/sbin:$PATH\nexport PATH"  >> /etc/profile
+    Blue "php编译完成"
 }
+
+#mian
+clear
+check_user
+remove_old_version
+remove_mdb
+system_update
+install_depends
+nginx_compile
+compile_mysql
+compile_php
+Blue "lnmp编译完成"
