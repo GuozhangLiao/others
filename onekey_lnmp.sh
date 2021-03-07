@@ -21,9 +21,22 @@ Blue(){
     echo -e "\033[34;01m$1\033[0m"
 }
 
+#检测系统
+check_os(){
+    osver=$(sed -n '/^ID=/p' /etc/os-release | sed 's/ID=//;s/"//;s/"//')
+    if [ "$osver" = centos ]
+    then
+        Blue "当前系统发行版本为：$osver"
+    else
+        Red "当前脚本只支持 centos 发行版"
+        exit 1
+    fi
+}
+
 #检查用户
 check_user(){
-    if [ $(id -u) -eq 0 ]
+    cur=$(id -u)
+    if [ "$cur" -eq 0 ]
     then
         Blue "当前用户为root用户！"
     else
@@ -31,7 +44,7 @@ check_user(){
         exit 1
     fi
     grep ^www /etc/passwd
-    if [ $? -ne 0 ]
+    if ! grep ^www /etc/passwd;
     then
         groupadd www
         useradd -g www www -s /sbin/nologin
@@ -115,25 +128,25 @@ install_depends(){
 #卸载nginx旧版本
 remove_old_version(){
     yum remove -y "nginx*"
-    find / -name nginx* -exec rm -rf {} \;
+    find / -name "nginx*" -exec rm -rf {} \;
 }
 
 #卸载 mariadb
 remove_mdb(){
     if rpm -qa | grep mariadb
     then
-        local mb=$(rpm -qa | grep mariadb)
-        rpm -e --nodeps $mb
+        mb=$(rpm -qa | grep mariadb)
+        rpm -e --nodeps "$mb"
         Green "卸载 Mariadb 成功！" 
     fi
 }
 
 #编译nginx
 nginx_compile(){
-    cd "$HOME"
+    cd "$HOME" || return 0
     wget -O "$HOME"/nginx-1.18.0.tar.gz http://mirrors.sohu.com/nginx/nginx-1.18.0.tar.gz
     tar -zxvf "$HOME"/nginx-1.18.0.tar.gz
-    cd "$HOME"/nginx-1.18.0
+    cd "$HOME"/nginx-1.18.0 || return 0
     ./configure \
     --user=www \
     --group=www \
@@ -176,11 +189,11 @@ EOF
 
 #编译安装mysql
 compile_mysql(){
-    cd "$HOME"
+    cd "$HOME" || return 0
     wget -O "$HOME"/mysql-5.7.30.tar.gz http://mirrors.sohu.com/mysql/MySQL-5.7/mysql-boost-5.7.30.tar.gz
     tar -zxvf "$HOME"/mysql-5.7.30.tar.gz
     mkdir "$HOME"/mysql-5.7.30/bld
-    cd "$HOME"/mysql-5.7.30/bld
+    cd "$HOME"/mysql-5.7.30/bld || return 0
     Green "开始编译 mysql-5.7.30 "
     cmake .. -DCPACK_MONOLITHIC_INSTALL=0 \
     -DENABLED_LOCAL_INFILE=1 \
@@ -268,10 +281,10 @@ EOF
 
 #编译安装php
 compile_php(){
-    cd "$HOME"
+    cd "$HOME" || return 0
     wget https://mirrors.sohu.com/php/php-7.4.15.tar.gz
     tar -zxf "$HOME"/php-7.4.15.tar.gz
-    cd "$HOME"/php-7.4.15
+    cd "$HOME"/php-7.4.15 || return 0
     ./configure \
     --prefix=/www/php \
     --with-fpm-user=www \
@@ -545,6 +558,7 @@ EOF
 
 #mian
 clear
+check_os
 check_user
 remove_old_version
 remove_mdb
