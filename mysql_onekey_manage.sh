@@ -41,10 +41,10 @@ higher_speed(){
 }
 
 compile_cmake() {
-    cd $HOME
+    cd "$HOME"
     wget https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4.tar.gz
-    tar -zxvf $HOME/cmake-3.19.4.tar.gz
-    cd $HOME/cmake-3.19.4
+    tar -zxvf "$HOME"/cmake-3.19.4.tar.gz
+    cd "$HOME"/cmake-3.19.4
     Green "开始编译 cmake "
     ./bootstrap
     make && make install
@@ -56,7 +56,7 @@ compile_cmake() {
 remove_mdb() {
     if rpm -qa | grep mariadb
     then
-        rpm -e --nodeps $mb
+        rpm -e --nodeps "$mb"
         Green "卸载 Mariadb 成功！" 
     fi
 }
@@ -66,11 +66,11 @@ compile_mysql() {
     useradd mysql -g mysql -s /sbin/nologin
     mkdir /usr/local/mysql
     mkdir /usr/local/mysql/data
-    cd $HOME
-    wget -O $HOME/mysql-5.7.30.tar.gz https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-5.7.30.tar.gz
-    tar -zxvf $HOME/mysql-5.7.30.tar.gz
-    mkdir $HOME/mysql-5.7.30/bld
-    cd $HOME/mysql-5.7.30/bld
+    cd "$HOME"
+    wget -O "$HOME"/mysql-5.7.30.tar.gz https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-5.7.30.tar.gz
+    tar -zxvf "$HOME"/mysql-5.7.30.tar.gz
+    mkdir "$HOME"/mysql-5.7.30/bld
+    cd "$HOME"/mysql-5.7.30/bld
     Green "开始编译 mysql-5.7.30 "
     cmake .. -DCPACK_MONOLITHIC_INSTALL=0 \
     -DENABLED_LOCAL_INFILE=1 \
@@ -157,7 +157,6 @@ WantedBy=multi-user.target
 EOF
     chmod 644 /etc/systemd/system/mysql.service
     echo -e "PATH=/usr/local/mysql/bin:/usr/local/mysql/lib:$PATH\nexport PATH" >> /etc/profile
-    . /etc/profile
     Green "编译安装 mysql 完成！"
 }
 

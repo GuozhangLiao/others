@@ -24,7 +24,7 @@ Blue(){
 #卸载旧版本
 remove_old_version(){
     yum remove -y "nginx*"
-    find / -name nginx* -exec rm -rf {} \;
+    find / -name "nginx*" -exec rm -rf {} \;
 }
 
 #安装编译工具和依赖
@@ -38,10 +38,10 @@ install_depends(){
 #编译安装nginx
 nginx_compile(){
     install_depends
-    cd $HOME
+    cd "$HOME" || exit 0
     wget http://nginx.org/download/nginx-1.18.0.tar.gz
-    tar -zxvf $HOME/nginx-1.18.0.tar.gz
-    cd $HOME/nginx-1.18.0
+    tar -zxvf "$HOME"/nginx-1.18.0.tar.gz
+    cd "$HOME"/nginx-1.18.0 || exit 0
     groupadd nginx
     useradd -g nginx nginx -s /sbin/nologin
     ./configure \

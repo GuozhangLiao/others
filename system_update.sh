@@ -25,12 +25,12 @@ Red(){
 
 #检查路径是否存在
 check_dst(){
-    if [ -d $logdst ]
+    if [ -d "$logdst" ]
     then
         Blue "-------------------------\n系统更新任务进行中...\n-------------------------$(date "+%F %T")"
     else
         Blue "-------------------------\n日志路径不存在，现在创建...\n-------------------------$(date "+%F %T")"
-        mkdir $logdst
+        mkdir "$logdst"
     fi
 }
 
@@ -51,7 +51,7 @@ check_network(){
 
 #指令动作
 Action (){
-     echo "hjkl;'" | sudo -S $kcmd $1 -y
+     echo "hjkl;'" | sudo -S $kcmd "$1" -y
 }
 
 Main (){
@@ -67,4 +67,4 @@ Main (){
     Blue "-------------------------\n所以任务完成\n-------------------------$(date "+%F %T")"
 }
 
-Main > $logdst/$udlog
+Main > "$logdst"/"$udlog"
