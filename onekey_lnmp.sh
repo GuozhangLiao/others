@@ -537,10 +537,6 @@ RestrictNamespaces=true
 WantedBy=multi-user.target
 EOF
     chmod 644 /etc/systemd/system/php-fpm.service
-    mkdir /www/php/tmp
-    sed -i '/session.save_path = "\/tmp"/csession.save_path = "\/www\/php\/tmp"' /etc/php.ini
-    sed -i '/date.timezone =/cdate.timezone = PRC' /etc/php.ini
-    sed -i '/expose_php =/s/On/Off/g' /etc/php.ini
     sed -i '/^user = nobody/s/nobody/www/g;/^group = nobody/s/nobody/www/g' /www/php/etc/php-fpm.d/www.conf
     chown -R www:www /www
     echo -e "PATH=/www/mysql/bin:/www/mysql/lib:/www/php/sbin:$PATH\nexport PATH"  >> /etc/profile
