@@ -9,7 +9,6 @@
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:~/bin
 export PATH
 timer1=$(date  +'%Y%m%d%H%M')
-#timer2=$(date "+%F %T")
 udlog="system_update_$timer1.log"
 logdst="$HOME/update_log"
 kcmd="aptitude"
@@ -56,12 +55,17 @@ Action (){
 
 Main (){
     check_network
+    echo
+    Red "-------------------------"
     check_dst
+    echo
+    Red "-------------------------"
     Action update
     Action safe-upgrade
     Blue "-------------------------\n系统升级完成\n$(date "+%F %T")"
+    echo
+    Red "-------------------------"
     Action clean
-
     local kcmd="apt-get"
     Action autoremove
     Blue "-------------------------\n所以任务完成\n$(date "+%F %T")"
