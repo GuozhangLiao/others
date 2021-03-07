@@ -57,14 +57,17 @@ Main (){
     check_network
     echo
     Red "-------------------------"
+    echo
     check_dst
     echo
     Red "-------------------------"
+    echo
     Action update
     Action safe-upgrade
     Blue "-------------------------\n系统升级完成\n$(date "+%F %T")"
     echo
     Red "-------------------------"
+    echo
     Action clean
     local kcmd="apt-get"
     Action autoremove
