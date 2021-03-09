@@ -9,8 +9,11 @@
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:~/bin
 export PATH
 timer1=$(date  +'%Y%m%d%H%M')
+cumonth=$(date +%m)
+cuyear=$(date +%Y)
 udlog="system_update_$timer1.log"
-logdst="$HOME/update_log"
+basedst="$HOME/update_log"
+logdst="${basedst}/${cuyear}/${cumonth}"
 kcmd="aptitude"
 
 #颜色
@@ -29,7 +32,7 @@ check_dst(){
         Blue "-------------------------\n系统更新任务进行中...\n$(date "+%F %T")"
     else
         Blue "-------------------------\n日志路径不存在，现在创建...\n$(date "+%F %T")"
-        mkdir "$logdst"
+        mkdir -p "$basedst"/"$cuyear"/"$cumonth"
     fi
 }
 
@@ -58,8 +61,6 @@ Main (){
     echo
     Red "-------------------------"
     echo
-    check_dst
-    echo
     Red "-------------------------"
     echo
     Action update
@@ -74,4 +75,5 @@ Main (){
     Blue "-------------------------\n所以任务完成\n$(date "+%F %T")"
 }
 
+check_dst >> "$basedst"/error.log
 Main > "$logdst"/"$udlog"
