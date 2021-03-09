@@ -29,9 +29,9 @@ Red(){
 check_dst(){
     if [ -d "$logdst" ]
     then
-        Blue "-------------------------\n系统更新任务进行中...\n$(date "+%F %T")"
+        Blue "-------------------------\n系统更新任务进行中...\n$(date "+%F %T")" > "$logdst"/"$udlog"
     else
-        Blue "-------------------------\n日志路径不存在，现在创建...\n$(date "+%F %T")"
+        Blue "-------------------------\n日志路径不存在，现在创建...\n$(date "+%F %T")" >> "$basedst"/error.log
         mkdir -p "$basedst"/"$cuyear"/"$cumonth"
     fi
 }
@@ -61,8 +61,6 @@ Main (){
     echo
     Red "-------------------------"
     echo
-    Red "-------------------------"
-    echo
     Action update
     Action safe-upgrade
     Blue "-------------------------\n系统升级完成\n$(date "+%F %T")"
@@ -75,5 +73,5 @@ Main (){
     Blue "-------------------------\n所以任务完成\n$(date "+%F %T")"
 }
 
-check_dst >> "$basedst"/error.log
-Main > "$logdst"/"$udlog"
+check_dst
+Main >> "$logdst"/"$udlog"
