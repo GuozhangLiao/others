@@ -8,7 +8,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:~/bin
 export PATH
 
-nodedst=$(/usr/bin/which node)
+nodedst=$(which node)
 
 #颜色
 Green(){
@@ -25,40 +25,38 @@ Blue(){
 
 #更新系统
 update_system(){
-    yum update -y > /dev/null 2>&1
+    yum update -y 
 }
 
 #安装 git
 git_install(){
-    yum install -y git > /dev/null 2>&1
+    yum install -y git
 }
 
 #安装 gcc-7.3
 gcc_install(){
-    yum install -y centos-release-scl > /dev/null 2>&1
-    yum install -y devtoolset-7-gcc* > /dev/null 2>&1
-    scl enable devtoolset-7 bash
+    yum install -y centos-release-scl 
+    yum install -y devtoolset-7-gcc*
     source /opt/rh/devtoolset-7/enable
-    mv /usr/bin/gcc /usr/bin/gcc-4.8.5
-    ln -s /opt/rh/devtoolset-7/root/bin/gcc /usr/bin/gcc
-    mv /usr/bin/g++ /usr/bin/g++-4.8.5
-    ln -s /opt/rh/devtoolset-7/root/bin/g++ /usr/bin/g++
-    gcc -v 
+    ln -s /opt/rh/devtoolset-7/root/usr/bin/gcc /usr/bin/gcc
+    ln -s /opt/rh/devtoolset-7/root/usr/bin/g++ /usr/bin/g++
+    gcc -v
+    g++ -v
     Green "安装 gcc-7.3 完成"
 }
 
 #编译安装最新 LTS的 Node.js
 compile_nodejs(){
-    cd $HOME 
+    cd "$HOME"
     curl -sOL https://nodejs.org/dist/v14.15.4/node-v14.15.4.tar.gz
     tar -zxf node-v14.15.4.tar.gz
-    cd node-v14.15.4 
-    ./configure && make && make install
+    cd node-v14.15.4
+    ./configure
+    make && make install
     clear
     node -v
     npm -v
     echo -e "export NODE_HOME=$nodedst\nexport PATH=\$NODE_HOME/bin:\$PATH"
-    . /etc/profile
     clear
     node -v
     npm -v
@@ -67,16 +65,23 @@ compile_nodejs(){
 
 #安装 Hexo 
 hexoinstall() {
-    npm install -g hexo-cli > /dev/null 2>&1
+    npm install -g hexo-cli 
     hexo -v
     Green "Hexo 安装完成"
 }
 
 #初始化 Hexo
-inithexo() {
+inithexo(){
     read -p '请输入需要初始化的项目路径: ' lj
-    hexo init $lj
-    cd $lj 
+    if [ -d "$lj" ]
+    then
+        Green "路径 $lj 存在！"
+    else
+        Red "路径不存在，现在创建..."
+        mkdir -p "$lj"
+    fi
+    hexo init "$lj"
+    cd "$lj" 
     npm install
     hexo g
     hexo s
@@ -94,14 +99,11 @@ menu(){
     Red "#                  @Repository: https://github.com/vod-ka               #"
     Red "#                                                                       #"
     Red "========================================================================="
-    Red
-    Red
-    Red "1，安装Hexo"
-    Red "--------------------------"
-    Red "2，初始化Hexo"
-    Red "--------------------------"
-    Red "0，exit"
-    Red "--------------------------"
+    echo
+    echo
+    Red "1，安装Hexo\n--------------------------"
+    Red "2，初始化Hexo\n--------------------------"
+    Red "0，exit\n--------------------------"
     read -p "请输入数字，回车键继续： " number
     case "$number" in
         1)
@@ -110,6 +112,7 @@ menu(){
         gcc_install
         compile_nodejs
         hexoinstall
+        menu
         ;;
         2)
         inithexo
