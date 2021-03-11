@@ -8,6 +8,8 @@
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:~/bin
 export PATH
 
+urltxt="$HOME/node-url.txt"
+node_bin_dst="/usr/local/lib/nodejs"
 nodedst=$(which node)
 
 #颜色
@@ -33,6 +35,33 @@ git_install(){
     yum install -y git
 }
 
+get_node(){
+    yum install -y lynx
+    lynx -dump http://nodejs.cn/download/ > "$urltxt"
+    node_src_url=$(grep " 8\." "$urltxt" | sed 's/..8\. //g')
+    node_src=$(grep " 8\." "$urltxt" | cut -d/ -f7 | cut -d. -f1-3)
+    node_bin_url=$(grep "15\." "$urltxt" | sed 's/..15\. //g')
+    node_ver=$(grep "15\." "$urltxt" | cut -d/ -f7 | cut -d. -f1-3)
+}
+
+nodejs_binary(){
+    cd "$HOME"
+    curl -sOL "$node_bin_url"
+    if [ -d $node_bin_dst ]
+    then
+        echo
+    else
+        mkdir -p "$node_bin_dst"
+    fi
+    tar -Gxvf "$HOME"/"$node_ver".tar.xz -C $node_bin_dst
+    echo "export PATH=/usr/local/lib/nodejs/$node_ver/bin:$PATH" >> /etc/profile
+    source /etc/profile
+    node -v
+    npm -v
+    npx -v
+    Green "nodejs二进制安装完成！"
+}
+
 #安装 gcc-7.3
 gcc_install(){
     yum install -y centos-release-scl 
@@ -48,9 +77,9 @@ gcc_install(){
 #编译安装最新 LTS的 Node.js
 compile_nodejs(){
     cd "$HOME"
-    curl -sOL https://nodejs.org/dist/v14.15.4/node-v14.15.4.tar.gz
-    tar -zxf node-v14.15.4.tar.gz
-    cd node-v14.15.4
+    curl -sOL "$node_src_url"
+    tar -zxvf "$node_src".tar.gz
+    cd "$node_src"
     ./configure
     make && make install
     clear
@@ -101,20 +130,30 @@ menu(){
     Red "========================================================================="
     echo
     echo
-    Red "1，安装Hexo\n--------------------------"
-    Red "2，初始化Hexo\n--------------------------"
+    Red "1，安装Hexo（nodejs二进制安装）        推荐\n--------------------------"
+    Red "2，安装Hexo（nodejs编译安装)\n--------------------------"
+    Red "3，初始化Hexo\n--------------------------"
     Red "0，exit\n--------------------------"
     read -p "请输入数字，回车键继续： " number
     case "$number" in
         1)
         update_system
         git_install
-        gcc_install
-        compile_nodejs
+        get_node
+        nodejs_binary
         hexoinstall
         menu
         ;;
         2)
+        update_system
+        git_install
+        gcc_install
+        get_node
+        compile_nodejs
+        hexoinstall
+        menu
+        ;;
+        3)
         inithexo
         ;;
         0)
@@ -124,4 +163,10 @@ menu(){
 }
 
 #main
-menu
+if [ $(id -u) -eq 0 ]
+then
+    menu
+else
+    Red "请使用 root 用户执行脚本"
+    exit 1
+fi
