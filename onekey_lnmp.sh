@@ -143,10 +143,10 @@ remove_mdb(){
 
 #编译nginx
 nginx_compile(){
-    cd "$HOME" || return 0
+    cd "$HOME"
     wget -O "$HOME"/nginx-1.18.0.tar.gz http://mirrors.sohu.com/nginx/nginx-1.18.0.tar.gz
     tar -zxvf "$HOME"/nginx-1.18.0.tar.gz
-    cd "$HOME"/nginx-1.18.0 || return 0
+    cd "$HOME"/nginx-1.18.0
     ./configure \
     --user=www \
     --group=www \
@@ -189,11 +189,11 @@ EOF
 
 #编译安装mysql
 compile_mysql(){
-    cd "$HOME" || return 0
+    cd "$HOME"
     wget -O "$HOME"/mysql-5.7.30.tar.gz http://mirrors.sohu.com/mysql/MySQL-5.7/mysql-boost-5.7.30.tar.gz
     tar -zxvf "$HOME"/mysql-5.7.30.tar.gz
     mkdir "$HOME"/mysql-5.7.30/bld
-    cd "$HOME"/mysql-5.7.30/bld || return 0
+    cd "$HOME"/mysql-5.7.30/bld
     Green "开始编译 mysql-5.7.30 "
     cmake .. -DCPACK_MONOLITHIC_INSTALL=0 \
     -DENABLED_LOCAL_INFILE=1 \
@@ -281,10 +281,10 @@ EOF
 
 #编译安装php
 compile_php(){
-    cd "$HOME" || return 0
+    cd "$HOME"
     wget https://mirrors.sohu.com/php/php-7.4.15.tar.gz
     tar -zxf "$HOME"/php-7.4.15.tar.gz
-    cd "$HOME"/php-7.4.15 || return 0
+    cd "$HOME"/php-7.4.15
     ./configure \
     --prefix=/www/php \
     --with-fpm-user=www \

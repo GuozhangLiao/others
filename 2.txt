@@ -1,5 +1,0 @@
-打包压缩
-tar -cJvf xxxfile.tar.xz xxxfile
-
-解压
-tar -xJvf xxxfile.tar.xz
