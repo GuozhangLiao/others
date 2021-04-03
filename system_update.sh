@@ -53,7 +53,7 @@ check_network(){
 
 #指令动作
 Action (){
-     echo "hjkl;'" | sudo -S $kcmd "$1" -y
+    echo "hjkl;'" | sudo -S $kcmd "$1" -y
 }
 
 Main (){
