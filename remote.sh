@@ -61,9 +61,19 @@ Ation(){
             ;;
         esac
         clear
-        read -rp "请输入密码 " -t 60 c
+        Green "1,默认密码\n-----------"
+        Green "2,手动输入\n-----------"
+        read -rp "请输入数字执行： " mima
+        case $mima in
+            1)
+            c="hq4008447776"
+            ;;
+            2)
+            read -rp "请输入密码 " -t 60 c
+            ;;
+        esac
         clear
-        Green "rdesktop远程链接中，如需断开链接请按Ctrl+C!"
+        Red "rdesktop远程连接中，按Ctrl+C断开连接!"
         rdesktop -u "$b" -p "$c" "$a" > /dev/null 2>&1
     else
         Red "指定地址无法连接，请检查地址！"
