@@ -1,3 +1,4 @@
+#!/bin/bash
 # @Author: Aliao  
 # @Repository: https://github.com/vod-ka   
 # @Date: 2021-04-21 20:17:13  
