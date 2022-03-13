@@ -42,9 +42,9 @@ higher_speed(){
 
 compile_cmake() {
     cd "$HOME"
-    wget https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4.tar.gz
-    tar -zxvf "$HOME"/cmake-3.19.4.tar.gz
-    cd "$HOME"/cmake-3.19.4
+    wget https://github.com/Kitware/CMake/releases/download/v3.22.3/cmake-3.22.3.tar.gz
+    tar -zxvf "$HOME"/cmake-3.22.3.tar.gz
+    cd "$HOME"/cmake-3.22.3
     Green "开始编译 cmake "
     ./bootstrap
     make && make install
@@ -67,16 +67,16 @@ compile_mysql() {
     mkdir /usr/local/mysql
     mkdir /usr/local/mysql/data
     cd "$HOME"
-    wget -O "$HOME"/mysql-5.7.30.tar.gz https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-5.7.30.tar.gz
-    tar -zxvf "$HOME"/mysql-5.7.30.tar.gz
-    mkdir "$HOME"/mysql-5.7.30/bld
-    cd "$HOME"/mysql-5.7.30/bld
-    Green "开始编译 mysql-5.7.30 "
+    wget -O "$HOME"/mysql-5.7.36.tar.gz https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-5.7.36.tar.gz
+    tar -zxvf "$HOME"/mysql-5.7.36.tar.gz
+    mkdir "$HOME"/mysql-5.7.36/bld
+    cd "$HOME"/mysql-5.7.36/bld
+    Green "开始编译 mysql-5.7.36 "
     cmake .. -DCPACK_MONOLITHIC_INSTALL=0 \
     -DENABLED_LOCAL_INFILE=1 \
     -DFORCE_UNSUPPORTED_COMPILER=1 \
     -DMYSQL_MAINTAINER_MODE=0 \
-    -DWITH_BOOST=/root/mysql-5.7.30/boost \
+    -DWITH_BOOST=/root/mysql-5.7.36/boost \
     -DWITH_CURL=system \
     -DWITH_SSL=system \
     -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
@@ -105,7 +105,7 @@ compile_mysql() {
 basedir=/usr/local/mysql
 datadir=/usr/local/mysql/data
 pid-file=/usr/local/mysql/data/mysqld.pid
-log-error=/usr/local/mysql/data/mysql.err
+log-error=/usr/local/mysql/data/mysql.error
 socket=/usr/local/mysql/mysql.sock
 user=mysql
 port=3306
@@ -157,6 +157,8 @@ WantedBy=multi-user.target
 EOF
     chmod 644 /etc/systemd/system/mysql.service
     echo -e "PATH=/usr/local/mysql/bin:/usr/local/mysql/lib:$PATH\nexport PATH" >> /etc/profile
+    source /etc/profile
+    grep password /usr/local/mysql/data/mysql.error
     Green "编译安装 mysql 完成！"
 }
 
