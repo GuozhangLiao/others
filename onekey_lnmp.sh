@@ -141,12 +141,18 @@ remove_mdb(){
     fi
 }
 
+#git连接加速
+higher_speed(){
+    echo -e "199.232.28.133       raw.githubusercontent.com" >> /etc/hosts
+    echo -e "nameserver  8.8.8.8\nnameserver  8.8.4.4" >> /etc/resolv.conf
+}
+
 #编译nginx
 nginx_compile(){
     cd "$HOME"
-    wget -O "$HOME"/nginx-1.18.0.tar.gz http://mirrors.sohu.com/nginx/nginx-1.18.0.tar.gz
-    tar -zxvf "$HOME"/nginx-1.18.0.tar.gz
-    cd "$HOME"/nginx-1.18.0
+    wget -O "$HOME"/nginx-1.20.2.tar.gz http://nginx.org/download/nginx-1.20.2.tar.gz
+    tar -zxvf "$HOME"/nginx-1.20.2.tar.gz
+    cd "$HOME"/nginx-1.20.2
     ./configure \
     --user=www \
     --group=www \
@@ -161,8 +167,136 @@ nginx_compile(){
     --with-threads \
     --with-pcre
     make && make install
+    cp -r ./html /www/
+    cat > /www/html/phpinfo.php << EOF
+<?php
+phpinfo();
+?>
+EOF
+    cat > /etc/nginx/nginx.conf <<-EOF
+
+user  www;
+worker_processes auto;
+worker_cpu_affinity auto;
+
+#error_log  logs/error.log;
+error_log  /var/log/nginx/error.log notice;
+#error_log  logs/error.log  info;
+
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        #charset koi8-r;
+
+        access_log  /var/log/nginx/host.access.log  main;
+
+        location / {
+            root   /www/html;
+            index  index.html index.htm index.php;
+        }
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /www/html;
+        }
+
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        location ~ \.php$ {
+            root           /wwww/html;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+            include        fastcgi_params;
+        }
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+
+
+    # another virtual host using mix of IP-, name-, and port-based configuration
+    #
+    #server {
+    #    listen       8000;
+    #    listen       somename:8080;
+    #    server_name  somename  alias  another.alias;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+
+    # HTTPS server
+    #
+    #server {
+    #    listen       443 ssl;
+    #    server_name  localhost;
+
+    #    ssl_certificate      cert.pem;
+    #    ssl_certificate_key  cert.key;
+
+    #    ssl_session_cache    shared:SSL:1m;
+    #    ssl_session_timeout  5m;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+}
+include /etc/nginx/conf.d/*.conf;
+include vhost/*.conf;
+EOF
     /www/nginx/sbin/nginx -V
-    ln -s /www/nginx/sbin/nginx /usr/bin/nginx
+    ln -sf /www/nginx/sbin/nginx /usr/bin/nginx
     cat > /etc/systemd/system/nginx.service<<-EOF
 [Unit]
 Description=The NGINX HTTP and reverse proxy server
@@ -190,16 +324,16 @@ EOF
 #编译安装mysql
 compile_mysql(){
     cd "$HOME"
-    wget -O "$HOME"/mysql-5.7.30.tar.gz http://mirrors.sohu.com/mysql/MySQL-5.7/mysql-boost-5.7.30.tar.gz
-    tar -zxvf "$HOME"/mysql-5.7.30.tar.gz
-    mkdir "$HOME"/mysql-5.7.30/bld
-    cd "$HOME"/mysql-5.7.30/bld
-    Green "开始编译 mysql-5.7.30 "
+    wget -O "$HOME"/mysql-5.7.36.tar.gz https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-5.7.36.tar.gz
+    tar -zxvf "$HOME"/mysql-5.7.36.tar.gz
+    mkdir "$HOME"/mysql-5.7.36/bld
+    cd "$HOME"/mysql-5.7.36/bld
+    Green "开始编译 mysql-5.7.36 "
     cmake .. -DCPACK_MONOLITHIC_INSTALL=0 \
     -DENABLED_LOCAL_INFILE=1 \
     -DFORCE_UNSUPPORTED_COMPILER=1 \
     -DMYSQL_MAINTAINER_MODE=0 \
-    -DWITH_BOOST=/root/mysql-5.7.30/boost \
+    -DWITH_BOOST=/root/mysql-5.7.36/boost \
     -DWITH_CURL=system \
     -DWITH_SSL=system \
     -DCMAKE_INSTALL_PREFIX=/www/mysql \
@@ -227,7 +361,7 @@ compile_mysql(){
 basedir=/www/mysql
 datadir=/www/mysql/data
 pid-file=/www/mysql/data/mysqld.pid
-log-error=/www/mysql/data/mysql.err
+log-error=/www/mysql/data/mysql.error
 socket=/www/mysql/mysql.sock
 user=www
 port=3306
@@ -276,7 +410,11 @@ EOF
     chown www:www /etc/my.cnf
     systemctl start mysqld
     /www/mysql/bin/mysqld --defaults-file=/etc/my.cnf --initialize --user=www
+    ln -sf /www/mysql/lib/mysql /usr/lib/mysql
+    ln -sf /www/mysql/include/mysql /usr/include/mysql
     Green "编译安装 mysql 完成！"
+    Red "mysql的初始密码："
+    grep password /usr/local/mysql/data/mysql.error | cut -d: -f4
 }
 
 #编译安装php
@@ -356,6 +494,7 @@ compile_php(){
     --enable-opcache
     make && make install
     /www/php/bin/php -v
+    rm -rf /etc/php.ini
     cat > /etc/php.ini<<-EOF
 [PHP]
 engine = On
@@ -366,15 +505,15 @@ zlib.output_compression = Off
 implicit_flush = Off
 unserialize_callback_func =
 serialize_precision = -1
-disable_functions = passthru,exec,system,putenv,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,readlink,symlink,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv
+disable_functions = passthru,exec,system,chroot,scandir,chgrp,chown,shell_exec,proc_open,proc_get_status,ini_alter,ini_alter,ini_restor e,dl,openlog,syslog,readlink,symlink,popepassthru,stream_socket_server,escapeshellcmd,dll,popen,disk_free_space,checkdnsrr,checkdnsrr,g etservbyname,getservbyport,disk_total_space,posix_ termid,posix_get_last_error,posix_getcwd,posix_getegid,posix_ geteuid,posix_getgid,po six_getgrgid,posix_getgrnam,posix_getgroups,posix_getlogin,posix_getpgid,posix_getpgrp,posix_getpid,posix_getppid,posix_getpwnam,posix_ getpwuid,posix_getrlimit,posix_getsid,posix_getuid,posix_isatty,posix_kill,posix_mkfifo,posix_setegid,posix_seteuid,posix_setgid,posix_ setpgid,posix_setsid,posix_setuid,posix_strerror,posix_times,posix_ttyname,posix_uname
 disable_classes =
 zend.enable_gc = On
 zend.exception_ignore_args = On
-expose_php = Off
+expose_php = On
 max_execution_time = 300
 max_input_time = 60
 memory_limit = 128M
-error_reporting = E_ALL & ~E_NOTICE
+error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
 display_errors = On
 display_startup_errors = Off
 log_errors = On
@@ -508,13 +647,15 @@ user = www
 group = www
 pm = dynamic
 pm.status_path = /phpfpm_status
-pm.max_children = 30
-pm.start_servers = 5
-pm.min_spare_servers = 5
-pm.max_spare_servers = 10
+pm.max_children = 40
+pm.start_servers = 20
+pm.min_spare_servers = 20
+pm.max_spare_servers = 40
+pm.max_requests = 1024
+pm.process_idle_timeout = 10s
 request_terminate_timeout = 100
-request_slowlog_timeout = 30
-slowlog = var/log/slow.lo
+request_slowlog_timeout = 0
+slowlog = var/log/slow.log
 include=/www/php/etc/php-fpm.d/*.conf
 EOF
     cat > /etc/systemd/system/php-fpm.service<<-EOF
@@ -552,7 +693,12 @@ EOF
     chmod 644 /etc/systemd/system/php-fpm.service
     sed -i '/^user = nobody/s/nobody/www/g;/^group = nobody/s/nobody/www/g' /www/php/etc/php-fpm.d/www.conf
     chown -R www:www /www
+    ln -sf /www/php/bin/php /usr/bin/php
+    ln -sf /www/php/bin/phpize /usr/bin/phpize
+    ln -sf /www/php/bin/pear /usr/bin/pear
+    ln -sf /www/php/bin/pecl /usr/bin/pecl
     echo -e "PATH=/www/mysql/bin:/www/mysql/lib:/www/php/sbin:$PATH\nexport PATH"  >> /etc/profile
+    source /etc/profile
     Blue "php编译完成"
 }
 
@@ -562,6 +708,7 @@ check_os
 check_user
 remove_old_version
 remove_mdb
+higher_speed
 system_update
 install_depends
 nginx_compile
