@@ -165,15 +165,17 @@ nginx_compile(){
     --with-http_realip_module \
     --with-http_gzip_static_module \
     --with-threads \
-    --with-pcre
+    --with-pcre \
+    --without-http_memcached_module
     make && make install
     cp -r ./html /www/
-    cat > /www/html/phpinfo.php << EOF
+    cat > /www/html/phpinfo.php<<-EOF
 <?php
 phpinfo();
 ?>
 EOF
-    cat > /etc/nginx/nginx.conf <<-EOF
+    rm -rf /www/nginx/conf/nginx.conf
+    cat > /www/nginx/conf/nginx.conf<<-EOF
 
 user  www;
 worker_processes auto;
@@ -353,9 +355,7 @@ compile_mysql(){
     -DWITH_SYSTEMD=1 \
     -DWITH_DEBUG=0 \
     -DENABLE_PROFILING=1
-    make && make install
-    chmod -R www:www /www/mysql/
-    /www/mysql/bin/mysql --version
+    make && make install   
     cat > /etc/my.cnf<<-EOF
 [mysqld]
 basedir=/www/mysql
@@ -368,6 +368,8 @@ port=3306
 character-set-server=utf8
 server-id=1
 EOF
+    chmod -R www:www /www/mysql/
+    /www/mysql/bin/mysql --version
     cat > /etc/systemd/system/mysql.service<<-EOF
 [Unit]
 Description=MySQL Server
@@ -495,7 +497,7 @@ compile_php(){
     make && make install
     /www/php/bin/php -v
     rm -rf /etc/php.ini
-    cat > /etc/php.ini<<-EOF
+    cat > /www/php/etc/php.ini<<-EOF
 [PHP]
 engine = On
 short_open_tag = On
@@ -630,7 +632,8 @@ opcache.revalidate_freq=3
 opcache.fast_shutdown=1
 opcache.enable_cli=1
 EOF
-    chown www:www /etc/php.ini
+    chown www:www /www/php/etc/php.ini
+    ln -sf /www/php/etc/php.ini /etc/php.ini
     cat > /www/php/etc/php-fpm.conf<<-EOF
 [global]
 pid = /var/run/php-fpm.pid
@@ -658,6 +661,7 @@ request_slowlog_timeout = 0
 slowlog = var/log/slow.log
 include=/www/php/etc/php-fpm.d/*.conf
 EOF
+    cp /www/php/etc/php-fpm.d/www.conf.default /www/php/etc/php-fpm.d/www.conf
     cat > /etc/systemd/system/php-fpm.service<<-EOF
 [Unit]
 Description=The PHP FastCGI Process Manager
