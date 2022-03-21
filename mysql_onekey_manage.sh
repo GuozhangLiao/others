@@ -113,7 +113,8 @@ character-set-server=utf8
 server-id=1
 EOF
     chown mysql:mysql /etc/my.cnf
-    /usr/local/mysql/bin/mysqld --defaults-file=/etc/my.cnf --initialize --user=mysql
+    ln -sf /usr/local/mysql/bin/mysqld /usr/bin/mysqld
+    mysqld --defaults-file=/etc/my.cnf --initialize --user=mysql
     cat > /etc/systemd/system/mysql.service<<-EOF
 [Unit]
 Description=MySQL Server
@@ -157,9 +158,11 @@ WantedBy=multi-user.target
 EOF
     chmod 644 /etc/systemd/system/mysql.service
     echo -e "PATH=/usr/local/mysql/bin:/usr/local/mysql/lib:$PATH\nexport PATH" >> /etc/profile
-    source /etc/profile
-    grep password /usr/local/mysql/data/mysql.error
+    ln -sf /usr/local/mysql/lib/mysql /usr/lib/mysql
+    ln -sf /usr/local/mysql/include/mysql /usr/include/mysql
     Green "编译安装 mysql 完成！"
+    Red "mysql的初始密码："
+    grep password /usr/local/mysql/data/mysql.error | cut -d: -f4
 }
 
 #main
