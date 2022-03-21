@@ -36,10 +36,10 @@ git_install(){
 }
 
 get_node(){
-    yum install -y lynx
+    yum install -y lynx > /dev/null 2>&1
     lynx -dump http://nodejs.cn/download/ > "$urltxt"
-    node_src_url=$(grep " 8\." "$urltxt" | sed 's/..8\. //g')
-    node_src=$(grep " 8\." "$urltxt" | cut -d/ -f7 | cut -d. -f1-3)
+    node_src_url=$(grep " 7\." "$urltxt" | sed 's/..7\. //g')
+    node_src=$(grep " 7\." "$urltxt" | cut -d/ -f7 | cut -d. -f1-3)
     node_bin_url=$(grep "15\." "$urltxt" | sed 's/..15\. //g')
     node_ver=$(grep "15\." "$urltxt" | cut -d/ -f7 | cut -d. -f1-3)
 }
@@ -112,7 +112,7 @@ inithexo(){
     fi
     hexo init "$lj"
     cd "$lj" 
-    npm install
+    npm install ./
     hexo g
     hexo s
     Green "初始 Hexo 成功，可以用浏览器打开 http://localhost:4000/ 查看测试页面！"

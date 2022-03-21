@@ -197,9 +197,9 @@ http {
     include       mime.types;
     default_type  application/octet-stream;
 
-    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-    #                  '$status $body_bytes_sent "$http_referer" '
-    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+    log_format  main  '\$remote_addr - $remote_user [\$time_local] "\$request" '
+                      '\$status $body_bytes_sent "\$http_referer" '
+                      '"\$http_user_agent" "\$http_x_forwarded_for"';
 
     #access_log  logs/access.log  main;
 
@@ -242,10 +242,10 @@ http {
         # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
         #
         location ~ \.php$ {
-            root           /wwww/html;
+            root           /www/html;
             fastcgi_pass   127.0.0.1:9000;
             fastcgi_index  index.php;
-            fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+            fastcgi_param  SCRIPT_FILENAME  \$document_root\$fastcgi_script_name;
             include        fastcgi_params;
         }
 
@@ -368,8 +368,6 @@ port=3306
 character-set-server=utf8
 server-id=1
 EOF
-    chmod -R www:www /www/mysql/
-    /www/mysql/bin/mysql --version
     cat > /etc/systemd/system/mysql.service<<-EOF
 [Unit]
 Description=MySQL Server
@@ -414,9 +412,10 @@ EOF
     /www/mysql/bin/mysqld --defaults-file=/etc/my.cnf --initialize --user=www
     ln -sf /www/mysql/lib/mysql /usr/lib/mysql
     ln -sf /www/mysql/include/mysql /usr/include/mysql
+    mysql --version
     Green "编译安装 mysql 完成！"
     Red "mysql的初始密码："
-    grep password /usr/local/mysql/data/mysql.error | cut -d: -f4
+    grep password /www/mysql/data/mysql.error | cut -d: -f4
 }
 
 #编译安装php
